@@ -57,7 +57,7 @@ x.connect("prop", "thrust_bal", [Dynamic.Mission.THRUST_TOTAL])
 x.connect("thrust_bal", "prop", ["thrust_req"])
 
 # create outputs
-x.add_output("breguet_eom", [Dynamic.Mission.DISTANCE, "cruise_time"], side="right")
+x.add_output("breguet_eom", [Dynamic.Mission.RANGE, "cruise_time"], side="right")
 # x.add_output("fc", ["EAS"], side="right")
 
 x.write("cruise_xdsm")

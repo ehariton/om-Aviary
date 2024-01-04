@@ -84,7 +84,7 @@ def run_accel():
     prob.set_val("accel.states:mass", accel.interp("mass", ys=[174974, 174878]))
     prob.set_val("accel.states:TAS", accel.interp("TAS", ys=[185, 252]))
     prob.set_val("accel.states:distance", accel.interp(
-        Dynamic.Mission.DISTANCE, ys=[0, 1.57]))
+        Dynamic.Mission.RANGE, ys=[0, 1.57]))
     prob.set_val("accel.t_duration", 1000)
     prob.set_val("accel.t_initial", 0)
 

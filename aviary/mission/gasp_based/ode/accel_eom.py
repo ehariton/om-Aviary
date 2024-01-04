@@ -72,7 +72,7 @@ class AccelerationRates(om.ExplicitComponent):
             self.add_output(Dynamic.Mission.ALTITUDE_RATE, val=np.ones(nn),
                             desc="altitude rate", units="ft/s")
             self.add_input(
-                Dynamic.Mission.DISTANCE, val=np.ones(nn), desc="distance traveled", units="ft")
+                Dynamic.Mission.RANGE, val=np.ones(nn), desc="distance traveled", units="ft")
 
     def compute(self, inputs, outputs):
         analysis_scheme = self.options["analysis_scheme"]

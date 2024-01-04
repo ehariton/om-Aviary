@@ -54,7 +54,7 @@ class FlightPathEOM(om.ExplicitComponent):
             self.add_input("t_curr", val=np.ones(nn), desc="time", units="s")
             self.add_input("distance_trigger", val=0, units="ft")
             add_aviary_input(self, Dynamic.Mission.ALTITUDE, val=np.ones(nn), units="ft")
-            add_aviary_input(self, Dynamic.Mission.DISTANCE, val=np.ones(nn), units="ft")
+            add_aviary_input(self, Dynamic.Mission.RANGE, val=np.ones(nn), units="ft")
 
         self.add_output("TAS_rate", val=np.ones(nn), desc="TAS rate", units="ft/s**2",
                         tags=['dymos.state_rate_source:TAS', 'dymos.state_units:kn'])

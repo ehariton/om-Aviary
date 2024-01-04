@@ -972,11 +972,11 @@ class AviaryProblem(om.Problem):
                 Phases=phases,
                 traj_final_state_output=[
                     Dynamic.Mission.MASS,
-                    Dynamic.Mission.DISTANCE,
+                    Dynamic.Mission.RANGE,
                 ],
                 traj_initial_state_input=[
                     Dynamic.Mission.MASS,
-                    Dynamic.Mission.DISTANCE,
+                    Dynamic.Mission.RANGE,
                     Dynamic.Mission.ALTITUDE,
                 ],
                 traj_event_trigger_input=[

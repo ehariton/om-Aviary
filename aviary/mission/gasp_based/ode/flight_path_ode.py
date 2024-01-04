@@ -218,7 +218,7 @@ class FlightPathODE(BaseODE):
                     Aircraft.Design.OPERATING_MASS,
                     Aircraft.CrewPayload.PASSENGER_PAYLOAD_MASS,  # should be total
                     Mission.Design.RESERVE_FUEL,
-                    Dynamic.Mission.DISTANCE,
+                    Dynamic.Mission.RANGE,
                     Dynamic.Mission.THROTTLE,
                     'required_lift',
                     'load_factor',
@@ -234,7 +234,7 @@ class FlightPathODE(BaseODE):
                 dummy_comp(),
                 promotes_inputs=["*"],)
             self.set_input_defaults(
-                Dynamic.Mission.DISTANCE, val=0, units='NM')
+                Dynamic.Mission.RANGE, val=0, units='NM')
             debug_comp = ['dummy_comp']
 
         if analysis_scheme is AnalysisScheme.SHOOTING:

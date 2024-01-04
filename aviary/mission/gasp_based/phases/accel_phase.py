@@ -72,7 +72,7 @@ def get_accel(
     )
 
     accel.add_state(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=fix_initial,
         fix_final=False,
         lower=distance_lower,

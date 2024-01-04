@@ -64,7 +64,7 @@ class AscentEOM(om.ExplicitComponent):
         )
 
         if analysis_scheme is AnalysisScheme.SHOOTING:
-            self.add_input(Dynamic.Mission.DISTANCE, val=np.ones(
+            self.add_input(Dynamic.Mission.RANGE, val=np.ones(
                 nn), desc="distance traveled", units="ft")
             self.add_input(Dynamic.Mission.ALTITUDE,
                            val=np.ones(nn), desc="alt", units="ft")

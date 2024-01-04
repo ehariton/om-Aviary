@@ -131,7 +131,7 @@ class BreguetCruiseODESolution(BaseODE):
                 Dynamic.Mission.FUEL_FLOW_RATE_NEGATIVE_TOTAL,
                 ("TAS_cruise", "TAS"),
             ],
-            promotes_outputs=[("cruise_range", Dynamic.Mission.DISTANCE),
+            promotes_outputs=[("cruise_range", Dynamic.Mission.RANGE),
                               ("cruise_time", "time")],
         )
 

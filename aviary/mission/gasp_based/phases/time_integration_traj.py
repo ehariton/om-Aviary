@@ -177,7 +177,7 @@ class FlexibleTraj(TimeIntegrationTrajBase):
 #             ODEs=[
 #                 groundroll, rotation, ascent, accel, climb1, climb2, climb3
 #             ],
-#             traj_final_state_output=[Dynamic.Mission.MASS, Dynamic.Mission.DISTANCE,],
+#             traj_final_state_output=[Dynamic.Mission.MASS, Dynamic.Mission.RANGE,],
 #             traj_promote_final_output=[Dynamic.Mission.ALTITUDE_RATE,
 #                                        Dynamic.Mission.FLIGHT_PATH_ANGLE, "TAS"],
 
@@ -324,9 +324,9 @@ class FlexibleTraj(TimeIntegrationTrajBase):
 
 #         self.setup_params(
 #             ODEs=[desc1, desc2, desc3],
-#             traj_final_state_output=[Dynamic.Mission.MASS, Dynamic.Mission.DISTANCE],
+#             traj_final_state_output=[Dynamic.Mission.MASS, Dynamic.Mission.RANGE],
 #             traj_initial_state_input=[Dynamic.Mission.MASS,
-#                                       Dynamic.Mission.DISTANCE, Dynamic.Mission.ALTITUDE],
+#                                       Dynamic.Mission.RANGE, Dynamic.Mission.ALTITUDE],
 #         )
 #         self.declare_partials(["*"], ["*"],)
 

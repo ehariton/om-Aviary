@@ -56,7 +56,7 @@ def make_ascent_problem(optimizer='IPOPT', print_opt_iters=False):
     ascent_to_gear_retract.set_state_options("mass",
                                              fix_initial=True, fix_final=False, lower=100.e3,       upper=None,    ref=175_000, defect_ref=175_000, rate_source=Dynamic.Mission.FUEL_FLOW_RATE_NEGATIVE_TOTAL)
 
-    ascent_to_gear_retract.set_state_options(Dynamic.Mission.DISTANCE,
+    ascent_to_gear_retract.set_state_options(Dynamic.Mission.RANGE,
                                              fix_initial=True, fix_final=False, lower=0,       upper=15_000,  ref=5280,    defect_ref=5280)
 
     # Note that t_init_gear and t_init_flaps are taking values of 100 s here while not being connected to the
@@ -129,7 +129,7 @@ def make_ascent_problem(optimizer='IPOPT', print_opt_iters=False):
     ascent_to_flap_retract.set_state_options("mass",
                                              fix_initial=False, fix_final=False, lower=1,       upper=None,    ref=175_000, defect_ref=175_000, rate_source=Dynamic.Mission.FUEL_FLOW_RATE_NEGATIVE_TOTAL)
 
-    ascent_to_flap_retract.set_state_options(Dynamic.Mission.DISTANCE,
+    ascent_to_flap_retract.set_state_options(Dynamic.Mission.RANGE,
                                              fix_initial=False, fix_final=False, lower=0,       upper=15_000,  ref=5280,    defect_ref=5280)
 
     # Targets are not needed when there is a top-level ODE input with the same name as the parameter, state, or control
@@ -198,7 +198,7 @@ def make_ascent_problem(optimizer='IPOPT', print_opt_iters=False):
     ascent_to_clean_aero.set_state_options("mass",
                                            fix_initial=False, fix_final=False, lower=1,       upper=None,    ref=175_000, defect_ref=175_000, rate_source=Dynamic.Mission.FUEL_FLOW_RATE_NEGATIVE_TOTAL)
 
-    ascent_to_clean_aero.set_state_options(Dynamic.Mission.DISTANCE,
+    ascent_to_clean_aero.set_state_options(Dynamic.Mission.RANGE,
                                            fix_initial=False, fix_final=False, lower=0,       upper=15_000,  ref=5_280,    defect_ref=5_280)
 
     # Targets are not needed when there is a top-level ODE input with the same name as the parameter, state, or control
@@ -265,7 +265,7 @@ def make_ascent_problem(optimizer='IPOPT', print_opt_iters=False):
 
     # 3. Enforce value continuity between all phases in ascent for time, states, and alpha control
     traj.link_phases(['ascent_to_gear_retract', 'ascent_to_flap_retract', 'ascent_to_clean_aero'],
-                     vars=['time', Dynamic.Mission.FLIGHT_PATH_ANGLE, Dynamic.Mission.ALTITUDE, 'TAS', Dynamic.Mission.MASS, Dynamic.Mission.DISTANCE, 'alpha'])
+                     vars=['time', Dynamic.Mission.FLIGHT_PATH_ANGLE, Dynamic.Mission.ALTITUDE, 'TAS', Dynamic.Mission.MASS, Dynamic.Mission.RANGE, 'alpha'])
 
     traj.add_linkage_constraint(phase_a='ascent_to_gear_retract',
                                 phase_b='ascent_to_flap_retract',
@@ -364,11 +364,11 @@ def make_ascent_problem(optimizer='IPOPT', print_opt_iters=False):
 
     # SET RANGE GUESSES
     p.set_val("traj.ascent_to_gear_retract.states:distance", ascent_to_gear_retract.interp(
-        Dynamic.Mission.DISTANCE, [4330.83393029, 5000]), units="ft")
+        Dynamic.Mission.RANGE, [4330.83393029, 5000]), units="ft")
     p.set_val("traj.ascent_to_flap_retract.states:distance",
-              ascent_to_flap_retract.interp(Dynamic.Mission.DISTANCE, [5000., 6000]), units="ft")
+              ascent_to_flap_retract.interp(Dynamic.Mission.RANGE, [5000., 6000]), units="ft")
     p.set_val("traj.ascent_to_clean_aero.states:distance",
-              ascent_to_clean_aero.interp(Dynamic.Mission.DISTANCE, [6000., 7000]), units="ft")
+              ascent_to_clean_aero.interp(Dynamic.Mission.RANGE, [6000., 7000]), units="ft")
 
     # SET TIME GUESSES
     p.set_val("traj.ascent_to_gear_retract.t_initial", 31.2)

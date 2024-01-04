@@ -90,7 +90,7 @@ def run_desc1(make_plots=False):
             Dynamic.Mission.ALTITUDE, ys=[
                 37500, 10000]))
     prob.set_val("desc1.states:distance", desc1.interp(
-        Dynamic.Mission.DISTANCE, ys=[2490, 2563.5]))
+        Dynamic.Mission.RANGE, ys=[2490, 2563.5]))
     prob.set_val("desc1.t_duration", 350)
     prob.set_val("desc1.t_initial", 0)
 

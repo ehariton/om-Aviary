@@ -506,7 +506,7 @@ class SGMCruise(SimuPyProblem):
         self.phase_name = phase_name
         self.event_channel_names = [
             Dynamic.Mission.MASS,
-            Dynamic.Mission.DISTANCE,
+            Dynamic.Mission.RANGE,
         ]
         self.num_events = len(self.event_channel_names)
 
@@ -515,7 +515,7 @@ class SGMCruise(SimuPyProblem):
         current_mass = self.get_val(Dynamic.Mission.MASS, units="lbm").squeeze()
         mass_trigger = self.get_val('mass_trigger.mass_trigger', units="lbm").squeeze()
 
-        distance = self.get_val(Dynamic.Mission.DISTANCE,
+        distance = self.get_val(Dynamic.Mission.RANGE,
                                 units=self.distance_trigger_units).squeeze()
         distance_trigger = self.get_val(
             "distance_trigger", units=self.distance_trigger_units).squeeze()

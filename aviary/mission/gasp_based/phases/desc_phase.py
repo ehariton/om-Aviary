@@ -94,7 +94,7 @@ def get_descent(
     )
 
     desc.add_state(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=fix_initial,
         input_initial=input_initial,
         fix_final=False,

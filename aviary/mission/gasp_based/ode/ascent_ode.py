@@ -85,7 +85,7 @@ class AscentODE(BaseODE):
             self.AddAlphaControl(alpha_mode=alpha_mode, num_nodes=nn)
 
         if analysis_scheme is AnalysisScheme.SHOOTING:
-            shooting_inputs = [Dynamic.Mission.DISTANCE]
+            shooting_inputs = [Dynamic.Mission.RANGE]
         else:
             shooting_inputs = []
 
@@ -108,7 +108,7 @@ class AscentODE(BaseODE):
                 "TAS_rate",
                 Dynamic.Mission.FLIGHT_PATH_ANGLE_RATE,
                 Dynamic.Mission.ALTITUDE_RATE,
-                Dynamic.Mission.DISTANCE_RATE,
+                Dynamic.Mission.RANGE_RATE,
                 "alpha_rate",
                 "normal_force",
                 "fuselage_pitch",

@@ -98,7 +98,7 @@ class DescentRates(om.ExplicitComponent):
         if analysis_scheme is AnalysisScheme.SHOOTING:
             self.add_input("t_curr", val=np.ones(nn), desc="time", units="s")
             self.add_input(
-                Dynamic.Mission.DISTANCE, val=np.ones(nn), desc="distance traveled", units="ft"
+                Dynamic.Mission.RANGE, val=np.ones(nn), desc="distance traveled", units="ft"
             )
 
     def compute(self, inputs, outputs):

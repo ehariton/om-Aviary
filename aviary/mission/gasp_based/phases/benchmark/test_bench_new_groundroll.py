@@ -40,7 +40,7 @@ def make_groundroll_problem(optimizer='IPOPT', print_opt_iters=False, solve_segm
     groundroll.set_state_options("mass",
                                  fix_initial=True, fix_final=False, lower=1, upper=195_000, ref=1000, defect_ref=1000, rate_source=Dynamic.Mission.FUEL_FLOW_RATE_NEGATIVE_TOTAL)
 
-    groundroll.set_state_options(Dynamic.Mission.DISTANCE,
+    groundroll.set_state_options(Dynamic.Mission.RANGE,
                                  fix_initial=True, fix_final=False, lower=0, upper=100_000, ref=1, defect_ref=1)
 
     groundroll.add_parameter("t_init_gear", units="s",
@@ -128,7 +128,7 @@ def make_groundroll_problem(optimizer='IPOPT', print_opt_iters=False, solve_segm
 
     p.set_val(
         "traj.groundroll.states:distance",
-        groundroll.interp(Dynamic.Mission.DISTANCE, [0, 3000]),
+        groundroll.interp(Dynamic.Mission.RANGE, [0, 3000]),
         units="ft",
     )
 

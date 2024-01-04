@@ -76,7 +76,7 @@ def make_climb_problem(
         rate_source=Dynamic.Mission.FUEL_FLOW_RATE_NEGATIVE_TOTAL)
 
     climb.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=True,
         fix_final=False,
         lower=0,
@@ -198,7 +198,7 @@ def make_climb_problem(
                 "mass", ys=[172.83e3, 171.e3]), units='lbm')
 
         prob.set_val("traj.climb.states:distance", climb.interp(
-            Dynamic.Mission.DISTANCE, ys=[15, 154]), units='NM')
+            Dynamic.Mission.RANGE, ys=[15, 154]), units='NM')
         prob.set_val("traj.climb.controls:alpha",
                      climb.interp("alpha", ys=[3, 2]), units='deg')
         prob.set_val("traj.climb.t_duration", 200, units='s')

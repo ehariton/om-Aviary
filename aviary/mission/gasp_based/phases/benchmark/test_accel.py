@@ -59,7 +59,7 @@ def make_accel_problem(
     accel.set_state_options("mass",
                             fix_initial=True, fix_final=False, lower=1, upper=None, units="lbm", ref=200000, defect_ref=200000, rate_source=Dynamic.Mission.FUEL_FLOW_RATE_NEGATIVE_TOTAL)
 
-    accel.set_state_options(Dynamic.Mission.DISTANCE,
+    accel.set_state_options(Dynamic.Mission.RANGE,
                             fix_initial=True, fix_final=False, lower=0, upper=None, units="ft", ref=10000, defect_ref=10000)
 
     accel.set_state_options(Dynamic.Mission.ALTITUDE,
@@ -134,7 +134,7 @@ def make_accel_problem(
         "mass", ys=[174219, 170000]), units='lbm')
 
     prob.set_val("traj.accel.states:distance", accel.interp(
-        Dynamic.Mission.DISTANCE, ys=[0, 154]), units='NM')
+        Dynamic.Mission.RANGE, ys=[0, 154]), units='NM')
     prob.set_val("traj.accel.t_duration", 10, units='s')
     prob.set_val("traj.accel.t_initial", 0, units='s')
 

@@ -101,7 +101,7 @@ class Phase2DOF:
             defect_ref=self.scalers.get_val("mass_defect_ref")["value"],
         )
         self.phase.add_state(
-            Dynamic.Mission.DISTANCE,
+            Dynamic.Mission.RANGE,
             fix_initial=self.initials.get_val("fix_initial_distance")["value"],
             input_initial=False,
             fix_final=False,  # should this be controllable?
@@ -109,7 +109,7 @@ class Phase2DOF:
             upper=self.bounds.get_val("distance_bounds")["value"][1],
             units=self.bounds.get_val("distance_bounds")["units"],
             rate_source="distance_rate",
-            targets=Dynamic.Mission.DISTANCE,
+            targets=Dynamic.Mission.RANGE,
             ref=self.scalers.get_val("distance_ref")["value"],
             ref0=self.scalers.get_val("distance_ref0")["value"],
             defect_ref=self.scalers.get_val("distance_defect_ref")["value"],
@@ -242,13 +242,13 @@ def linked_vars(phase1, phase2):  # TODO: add other combinations of phases
     linked_vars = []
 
     if type1 == "takeoff" and type2 == Dynamic.Mission.VELOCITY_RATE:
-        linked_vars = [Dynamic.Mission.DISTANCE, "time", Dynamic.Mission.MASS, "TAS"]
+        linked_vars = [Dynamic.Mission.RANGE, "time", Dynamic.Mission.MASS, "TAS"]
     elif type1 == Dynamic.Mission.VELOCITY_RATE and type2 == "climb":
         linked_vars = ["time", Dynamic.Mission.ALTITUDE,
-                       Dynamic.Mission.MASS, Dynamic.Mission.DISTANCE]
+                       Dynamic.Mission.MASS, Dynamic.Mission.RANGE]
     elif type1 == "climb" and type2 == "climb":
         linked_vars = ["time", Dynamic.Mission.ALTITUDE,
-                       Dynamic.Mission.MASS, Dynamic.Mission.DISTANCE]
+                       Dynamic.Mission.MASS, Dynamic.Mission.RANGE]
     elif type1 == "climb" and type2 == "cruise":
         linked_vars = []  # TODO: update this
     elif type1 == "cruise" and type2 == "descent":

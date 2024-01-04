@@ -76,7 +76,7 @@ def make_rotation_problem(optimizer='IPOPT', print_opt_iters=False):
                                defect_ref=1000.0, rate_source=Dynamic.Mission.FUEL_FLOW_RATE_NEGATIVE_TOTAL,
                                )
 
-    rotation.set_state_options(Dynamic.Mission.DISTANCE,
+    rotation.set_state_options(Dynamic.Mission.RANGE,
                                fix_initial=True, fix_final=False, lower=0, upper=10.e3, ref=100, defect_ref=100)
 
     # boundary/path constraints + controls
@@ -139,7 +139,7 @@ def make_rotation_problem(optimizer='IPOPT', print_opt_iters=False):
 
     # SET RANGE INITIAL GUESS
     p.set_val("traj.rotation.states:distance", rotation.interp(
-        Dynamic.Mission.DISTANCE, [3680.37217765, 4000]), units="ft")
+        Dynamic.Mission.RANGE, [3680.37217765, 4000]), units="ft")
 
     # SET TIME INITIAL GUESS
     p.set_val("traj.rotation.t_initial", 30.0)

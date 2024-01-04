@@ -98,11 +98,11 @@ def run_aviary(aircraft_filename, phase_info, mission_method, mass_method, optim
         Phases=phases,
         traj_final_state_output=[
             Dynamic.Mission.MASS,
-            Dynamic.Mission.DISTANCE,
+            Dynamic.Mission.RANGE,
         ],
         traj_initial_state_input=[
             Dynamic.Mission.MASS,
-            Dynamic.Mission.DISTANCE,
+            Dynamic.Mission.RANGE,
             Dynamic.Mission.ALTITUDE,
         ],
         traj_event_trigger_input=[

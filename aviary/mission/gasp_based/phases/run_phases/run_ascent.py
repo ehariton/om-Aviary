@@ -100,7 +100,7 @@ def run_ascent(make_plots=False):
     )
     p.set_val(
         "traj.ascent.states:distance",
-        ascent.interp(Dynamic.Mission.DISTANCE, [4330.83393029, 5000]),
+        ascent.interp(Dynamic.Mission.RANGE, [4330.83393029, 5000]),
         units="ft",
     )
     p.set_val("traj.ascent.t_initial", 31.2)

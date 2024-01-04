@@ -75,7 +75,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=1000)
 
     groundroll.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=True,
         fix_final=False,
         lower=0,
@@ -157,7 +157,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=1000.0,)
 
     rotation.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=False,
         fix_final=False,
         lower=0,
@@ -231,7 +231,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=175_000)
 
     ascent_to_gear_retract.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=False,
         fix_final=False,
         lower=0,
@@ -349,7 +349,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=175_000)
 
     ascent_to_flap_retract.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=False,
         fix_final=False,
         lower=0,
@@ -471,7 +471,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=175_000)
 
     ascent_to_clean_aero.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=False,
         fix_final=False,
         lower=0,
@@ -593,7 +593,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=175_000e1)
 
     accel.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=False,
         lower=0,
         upper=None,
@@ -658,7 +658,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=200000)
 
     constant_EAS_climb.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=False,
         fix_final=False,
         lower=0,
@@ -784,7 +784,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=200000)
 
     climb_to_mach.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=False,
         fix_final=False,
         lower=0,
@@ -812,7 +812,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=1.0)
 
     climb_to_mach.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=False,
         lower=0,
         upper=None,
@@ -889,7 +889,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=200000)
 
     climb_to_cruise.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=False,
         fix_final=False,
         lower=0,
@@ -918,7 +918,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         defect_ref=1.0)
 
     climb_to_cruise.set_state_options(
-        Dynamic.Mission.DISTANCE,
+        Dynamic.Mission.RANGE,
         fix_initial=False,
         lower=0,
         upper=None,
@@ -993,7 +993,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
     cruise.add_timeseries_output("time", units="s")
 
     cruise.add_boundary_constraint(
-        Dynamic.Mission.DISTANCE, loc="final", equals=TARGET_RANGE, ref=TARGET_RANGE, units="NM")
+        Dynamic.Mission.RANGE, loc="final", equals=TARGET_RANGE, ref=TARGET_RANGE, units="NM")
 
     #
     # PROBLEM DEFINITION
@@ -1061,7 +1061,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
 
     traj.add_linkage_constraint(phase_a='climb_to_cruise',
                                 phase_b='cruise',
-                                var_a=Dynamic.Mission.DISTANCE,
+                                var_a=Dynamic.Mission.RANGE,
                                 var_b='initial_distance',
                                 loc_a='final',
                                 loc_b='initial',
@@ -1094,12 +1094,12 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
     # 2. Continuity for rotation to first ascent phase. Altitude and flight
     # path angle are not states on the ground.
     traj.link_phases(['groundroll', 'rotation'],
-                     vars=['time', 'TAS', 'mass', Dynamic.Mission.DISTANCE])
+                     vars=['time', 'TAS', 'mass', Dynamic.Mission.RANGE])
 
     # Continuity for rotation to first ascent phase. Altitude and flight path
     # angle are not states on the ground.
     traj.link_phases(['rotation', 'ascent_to_gear_retract'], vars=[
-                     'time', 'TAS', 'mass', Dynamic.Mission.DISTANCE, 'alpha', Dynamic.Mission.FLIGHT_PATH_ANGLE, Dynamic.Mission.ALTITUDE])
+                     'time', 'TAS', 'mass', Dynamic.Mission.RANGE, 'alpha', Dynamic.Mission.FLIGHT_PATH_ANGLE, Dynamic.Mission.ALTITUDE])
 
     # 3. Enforce value continuity between all phases in ascent for time,
     # states, and alpha control
@@ -1112,7 +1112,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
                            Dynamic.Mission.ALTITUDE,
                            'TAS',
                            Dynamic.Mission.MASS,
-                           Dynamic.Mission.DISTANCE,
+                           Dynamic.Mission.RANGE,
                            'alpha'])
 
     traj.link_phases([Dynamic.Mission.VELOCITY_RATE,
@@ -1122,7 +1122,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
                      vars=['time',
                            Dynamic.Mission.ALTITUDE,
                            Dynamic.Mission.MASS,
-                           Dynamic.Mission.DISTANCE])
+                           Dynamic.Mission.RANGE])
 
     # Post trajectory analyses
     p.model.add_subsystem("vrot_comp", VRotateComp())
@@ -1155,7 +1155,7 @@ def run_conventional_problem(make_plots=True, optimizer="IPOPT"):
         phase.add_timeseries_output('EAS', units="kn")
         phase.add_timeseries_output('TAS', units="kn")
         phase.add_timeseries_output('mass', units="lbm")
-        phase.add_timeseries_output(Dynamic.Mission.DISTANCE, units="NM")
+        phase.add_timeseries_output(Dynamic.Mission.RANGE, units="NM")
 
     # Setup the solvers
     # We're roughtly twice as fast per iteration with a direct solver at the phase level.

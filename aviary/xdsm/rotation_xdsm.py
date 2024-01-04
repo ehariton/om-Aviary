@@ -67,7 +67,7 @@ x.add_output("eom", [
     "TAS_rate",
     Dynamic.Mission.FLIGHT_PATH_ANGLE_RATE,
     Dynamic.Mission.ALTITUDE_RATE,
-    Dynamic.Mission.DISTANCE_RATE,
+    Dynamic.Mission.RANGE_RATE,
     "alpha_rate",
     "normal_force",
     "fuselage_pitch",

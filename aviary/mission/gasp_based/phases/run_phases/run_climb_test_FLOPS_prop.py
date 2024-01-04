@@ -30,7 +30,7 @@ varinfo = {
     "time": ("TIME", "time", "s"),
     Dynamic.Mission.ALTITUDE: ("ALT", "states:altitude", "ft"),
     "mass": ("MASS", "states:mass", "lbm"),
-    Dynamic.Mission.DISTANCE: ("RANGE", "states:distance", "NM"),
+    Dynamic.Mission.RANGE: ("RANGE", "states:distance", "NM"),
     Dynamic.Mission.MACH: ("MACH", Dynamic.Mission.MACH, None),
     "EAS": ("EAS", "EAS", "kn"),
     "alpha": ("ALPHA", "alpha", "deg"),
@@ -105,7 +105,7 @@ def setup_climb1():
     #         Dynamic.Mission.ALTITUDE, ys=[
     #             0.40, 1.0]))
     prob.set_val("climb1.states:distance", climb1.interp(
-        Dynamic.Mission.DISTANCE, ys=[2, 15]))
+        Dynamic.Mission.RANGE, ys=[2, 15]))
     prob.set_val("climb1.t_duration", 1000)
     prob.set_val("climb1.t_initial", 0)
 
@@ -160,7 +160,7 @@ def setup_climb2():
             Dynamic.Mission.ALTITUDE, ys=[
                 10000, 37500]))
     prob.set_val("climb2.states:distance", climb2.interp(
-        Dynamic.Mission.DISTANCE, ys=[15, 154]))
+        Dynamic.Mission.RANGE, ys=[15, 154]))
     prob.set_val("climb2.t_duration", 1500)
     prob.set_val("climb2.t_initial", 0)
 
@@ -267,7 +267,7 @@ def gen_plots(phasename, probdata, simdata, plot_dir, show=False):
 
         return fig
 
-    gen_plot("States", [Dynamic.Mission.ALTITUDE, "mass", Dynamic.Mission.DISTANCE])
+    gen_plot("States", [Dynamic.Mission.ALTITUDE, "mass", Dynamic.Mission.RANGE])
     plt.savefig(os.path.join(plot_dir, f"{phasename}_states.pdf"))
 
     gen_plot("Speeds", [Dynamic.Mission.MACH, "EAS"])

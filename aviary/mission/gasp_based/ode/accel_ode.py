@@ -72,7 +72,7 @@ class AccelODE(BaseODE):
                                    promotes_outputs=subsystem.mission_outputs(**kwargs))
 
         sgm_inputs = [
-            't_curr', Dynamic.Mission.DISTANCE] if analysis_scheme is AnalysisScheme.SHOOTING else []
+            't_curr', Dynamic.Mission.RANGE] if analysis_scheme is AnalysisScheme.SHOOTING else []
         sgm_outputs = [
             Dynamic.Mission.ALTITUDE_RATE] if analysis_scheme is AnalysisScheme.SHOOTING else []
 

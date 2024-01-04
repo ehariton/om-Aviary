@@ -146,7 +146,7 @@ class DescentODE(BaseODE):
             constraint_args = {'analysis_scheme': AnalysisScheme.SHOOTING,
                                'alt_trigger_units': self.options["alt_trigger_units"],
                                'speed_trigger_units': self.options["speed_trigger_units"]}
-            integration_states = ["t_curr", Dynamic.Mission.DISTANCE]
+            integration_states = ["t_curr", Dynamic.Mission.RANGE]
             constraint_inputs = ["alt_trigger", "speed_trigger"]
 
             lift_balance_group = self

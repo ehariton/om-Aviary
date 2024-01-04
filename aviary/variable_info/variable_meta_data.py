@@ -5852,28 +5852,6 @@ add_meta_data(
 )
 
 add_meta_data(
-    Dynamic.Mission.DISTANCE,
-    meta_data=_MetaData,
-    historical_name={"GASP": None,
-                     "FLOPS": None,
-                     "LEAPS1": None
-                     },
-    units='NM',
-    desc="The total distance the vehicle has traveled since brake release at the current time"
-)
-
-add_meta_data(
-    Dynamic.Mission.DISTANCE_RATE,
-    meta_data=_MetaData,
-    historical_name={"GASP": None,
-                     "FLOPS": None,
-                     "LEAPS1": None
-                     },
-    units='NM/s',
-    desc="The rate at which the distance traveled is changing at the current time"
-)
-
-add_meta_data(
     Dynamic.Mission.DRAG,
     meta_data=_MetaData,
     historical_name={"GASP": None,
@@ -6083,7 +6061,7 @@ add_meta_data(
 add_meta_data(
     Dynamic.Mission.RANGE,
     meta_data=_MetaData,
-    historical_name={"GASP": None,
+    historical_name={"GASP": ['DISTANCE', 'Dynamic.Mission.DISTANCE'],
                      "FLOPS": None,
                      "LEAPS1": None
                      },
@@ -6094,7 +6072,7 @@ add_meta_data(
 add_meta_data(
     Dynamic.Mission.RANGE_RATE,
     meta_data=_MetaData,
-    historical_name={"GASP": None,
+    historical_name={"GASP": ['DISTANCE_RATE', 'Dynamic.Mission.DISTANCE_RATE'],
                      "FLOPS": None,
                      "LEAPS1": None
                      },
