@@ -1,6 +1,11 @@
 # Reserve Mission Examples
+The reserve mission examples are broken up into two sections: height-energy missions (defualt), and 2DOF missions. 
+Single phase reserves for fixed-time and fixed-range will be presented as well as an example of a multiphase reserve mission.
+An overview of how to formulate a reserve mission is presented in [Reserve Mission User Guide](../user_guide/reserve_missions.md). 
 
-## Fixed Range Reserve
+## Height Energy Reserve Missions
+
+### Fixed Range Reserve
 
 The simplest example of a reserve mission implementation can be seen in `run_reserve_mission_fixedrange.py`.
 In this example we add a fixed range cruise to the `run_basic_aviary_example.py`.
@@ -19,7 +24,7 @@ There is no discontinuity between regular and reserve phases for either distance
 ![Distance](images/fixed_range_cruise_distance.png "Distance vs. Time for Fixed Range Cruise Reserve Example")
 ![Mass](images/fixed_range_cruise_mass.png "Mass vs. Time for Fixed Range Cruise Reserve Example")
 
-## Fixed Time Reserve
+### Fixed Time Reserve
 
 An example of a fixed-time reserve mission implementation can be found in `run_reserve_mission_fixedtime.py`.
 This example builds upon the basic flight defined in `run_basic_aviary_example.py`.
@@ -28,7 +33,7 @@ We have also removed other references to time in the reserve phase definition.
 We do not list `initial_guesses:times`, `user_options:duration_bounds`, or `user_options:fixed_duration`.
 All of these are set automatically when we set `target_duration`.
 
-## Multiphase Reserve Mission
+### Multiphase Reserve Mission
 
 The last example reserve mission includes five phases: climb, cruise for distance, cruise for time, cruise for distance, descend.
 This example is contained in `run_reserve_mission_multiphase.py`.
@@ -39,6 +44,8 @@ Results from this mission can be seen in the figure below.
 ![Multiphase](images/multiphase_reserve.png "Distance vs. Time for Multiphase Reserve Example")
 There are three distinct cruise segments and the added reserve climb and reserve descent show a more realistic flight profile for a diverted aircraft.
 
-## More Reading
+## 2DOF Reserve Missions
 
-An overview of reserve missions is presented in [Reserve Mission User Guide](../user_guide/reserve_missions.md).
+### Fixed Range Reserve
+### Fixed Time Reserve
+### Multiphase Reserve Mission
