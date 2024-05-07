@@ -1,7 +1,7 @@
 from aviary.subsystems.subsystem_builder_base import SubsystemBuilderBase
 from aviary.subsystems.propulsion.motor.model.motor_premission import MotorPreMission
 from aviary.subsystems.propulsion.motor.model.motor_mission import MotorMission
-from aviary.subsystems.propulsion.motor.motor_variables import Aircraft, Mission, Dynamic
+from aviary.subsystems.propulsion.motor.motor_variables import Aircraft, Dynamic
 from aviary.subsystems.propulsion.motor.motor_variable_meta_data import ExtendedMetaData
 
 
@@ -117,11 +117,11 @@ class MotorBuilder(SubsystemBuilderBase):
         '''
         if self.include_constraints:
             constraints = {
-                Dynamic.Mission.Motor.TORQUE_CON: {
-                    'upper': 0.0,
-                    'type': 'path'
-                }
-                # TBD Gearbo torque constraint
+                # Dynamic.Mission.Motor.TORQUE_CON: {
+                #     'upper': 0.0,
+                #     'type': 'path'
+                # }
+                # # TBD Gearbo torque constraint
             }
         else:
             constraints = {}
@@ -257,4 +257,9 @@ class MotorBuilder(SubsystemBuilderBase):
 
         return [Dynamic.Mission.Prop.TORQUE,
                 Dynamic.Mission.Prop.SHAFT_POWER,
-                Dynamic.Mission.ELECTRIC_POWER]  # we're assuming we have a single motor
+                Dynamic.Mission.Prop.SHAFT_POWER_MAX,
+                Aircraft.Prop.RPM,
+                Dynamic.Mission.ELECTRIC_POWER,
+                Dynamic.Mission.THRUST,
+                Dynamic.Mission.NOX_RATE,
+                Dynamic.Mission.FUEL_FLOW_RATE_NEGATIVE]

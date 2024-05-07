@@ -109,7 +109,8 @@ class TurbopropModel(EngineModel):
         if shp_model_mission is not None:  # If power generation is seperate from propellar do this!
             turboprop_group.add_subsystem(shp_model.name,
                                           subsys=shp_model_mission,
-                                          promotes_inputs=['*'],
+                                          promotes_inputs=[
+                                              '*', (Dynamic.Mission.THRUST, 'turboshaft_thrust')],
                                           promotes_outputs=['*'])
 
             # Add IVC just for max throttle
@@ -166,15 +167,6 @@ class TurbopropModel(EngineModel):
                                                                 'EAS',
                                                                 ('TAS', 'velocity')])
 
-                turboprop_max_group.add_subsystem('flight_conditions',
-                                                  FlightConditions(num_nodes=num_nodes,
-                                                                   input_speed_type=SpeedType.MACH),
-                                                  promotes_inputs=['rho',
-                                                                   Dynamic.Mission.SPEED_OF_SOUND,
-                                                                   Dynamic.Mission.MACH],
-                                                  promotes_outputs=[Dynamic.Mission.DYNAMIC_PRESSURE,
-                                                                    'EAS',
-                                                                    ('TAS', 'velocity')])
             # Hamilton Standard method
             turboprop_group.add_subsystem('propeller_model',
                                           PropellerPerformance(aviary_options=self.options,
@@ -198,8 +190,10 @@ class TurbopropModel(EngineModel):
                                        num_nodes), 'units': 'lbf'},
                                    propeller_thrust={'val': np.zeros(num_nodes), 'units': 'lbf'})
 
-        turboprop_group.add_subsystem('turboprop_max_group', turboprop_max_group, promotes_outputs=[
-                                      Dynamic.Mission.THRUST_MAX])
+        turboprop_group.add_subsystem('turboprop_max_group', turboprop_max_group,
+                                      promotes_inputs=['*']
+                                      promotes_outputs=[
+                                          Dynamic.Mission.THRUST_MAX])
         turboprop_max_group.set_input_defaults(
             Dynamic.Mission.TEMPERATURE, 288.15*np.ones(num_nodes), units='K')
         turboprop_max_group.set_input_defaults(

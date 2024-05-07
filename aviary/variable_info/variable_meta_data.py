@@ -6349,6 +6349,17 @@ add_meta_data(
 )
 
 add_meta_data(
+    Dynamic.Mission.Prop.SHAFT_POWER_MAX,
+    meta_data=_MetaData,
+    historical_name={"GASP": None,
+                     "FLOPS": None,
+                     "LEAPS1": None
+                     },
+    units='hp',
+    desc='The maximum possible shaft horsepower that could be sent into a single propellar, primarily used for ensuring excess power constraints'
+)
+
+add_meta_data(
     Dynamic.Mission.SHAFT_POWER_CORRECTED,
     meta_data=_MetaData,
     historical_name={"GASP": 'SHPCOR',

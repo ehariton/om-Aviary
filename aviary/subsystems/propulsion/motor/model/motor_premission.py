@@ -1,6 +1,6 @@
 import openmdao.api as om
 
-from aviary.subsystems.propulsion.motor.motor_variables import Mission, Aircraft, Dynamic
+from aviary.subsystems.propulsion.motor.motor_variables import Aircraft, Dynamic
 from aviary.utils.aviary_values import AviaryValues
 from aviary.subsystems.propulsion.motor.model.motor_map import MotorMap
 
@@ -34,7 +34,7 @@ class MotorPreMission(om.Group):
                            promotes_inputs=[Aircraft.Engine.SCALE_FACTOR,
                                             Dynamic.Mission.THROTTLE,
                                             Aircraft.Motor.RPM],
-                           promotes_outputs=[(Dynamic.Mission.Motor.TORQUE,
+                           promotes_outputs=[(Dynamic.Mission.TORQUE,
                                               Aircraft.Motor.TORQUE_MAX)])
 
         # Motor mass relationship based on continuous torque rating for aerospace motors (Figure 10)
@@ -48,3 +48,10 @@ class MotorPreMission(om.Group):
                            promotes_outputs=[('motor_mass', Aircraft.Motor.MASS)])
 
         # TBD Gearbox mass calc goes here?
+
+        self.add_subsystem('rpm',
+                           om.ExecComp('rpm_gearbox = rpm_motor',
+                                       rpm_gearbox={'val': 1.0, 'units': 'rpm'},
+                                       rpm_motor={'val': 1.0, 'units': 'rpm'}),
+                           promotes_inputs=[('rpm_motor', Aircraft.Motor.RPM)],
+                           promotes_outputs=[('rpm_gearbox', Aircraft.Prop.RPM)])

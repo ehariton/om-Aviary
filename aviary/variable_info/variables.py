@@ -636,8 +636,7 @@ class Dynamic:
 
         class Prop:
             SHAFT_POWER = 'dynamic:mission:prop:shaft_power'
-            # TBD move all prop items from Dynamic.Mission here!
-
+            SHAFT_POWER_MAX = 'dynamic:mission:prop:shaft_power_max'
 
 class Mission:
 

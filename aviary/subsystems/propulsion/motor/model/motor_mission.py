@@ -3,7 +3,7 @@ import numpy as np
 import openmdao.api as om
 from aviary.utils.aviary_values import AviaryValues
 
-from aviary.subsystems.propulsion.motor.motor_variables import Dynamic, Aircraft, Mission
+from aviary.subsystems.propulsion.motor.motor_variables import Dynamic, Aircraft
 from aviary.subsystems.propulsion.motor.model.motor_map import MotorMap
 
 
@@ -26,10 +26,17 @@ class MotorMission(om.Group):
         n = self.options["num_nodes"]
 
         ivc = om.IndepVarComp()
+
+        # TBD Remove this
+        # this is an artifact of allowing the motor and turbine engine
+        # to swap easily between the two.
+        ivc.add_output(Dynamic.Mission.THRUST, val=np.zeros(n), units='N')
         ivc.add_output(Dynamic.Mission.FUEL_FLOW_RATE_NEGATIVE,
                        val=np.zeros(n), units='kg/s')
-        ivc.add_output(Dynamic.Mission.ELECTRIC_POWER, val=np.zeros(n), units='kW')
         ivc.add_output(Dynamic.Mission.NOX_RATE, val=np.zeros(n), units='kg/s')
+
+        ivc.add_output('max_throttle', val=np.ones(n), units=None)
+
         self.add_subsystem('ivc', ivc, promotes=['*'])
 
         motor_group = om.Group()
@@ -38,7 +45,7 @@ class MotorMission(om.Group):
                                   promotes_inputs=[Dynamic.Mission.THROTTLE,
                                                    Aircraft.Engine.SCALE_FACTOR,
                                                    Aircraft.Motor.RPM],
-                                  promotes_outputs=[Dynamic.Mission.Motor.TORQUE,
+                                  promotes_outputs=[Dynamic.Mission.TORQUE,
                                                     Dynamic.Mission.Motor.EFFICIENCY])
 
         motor_group.add_subsystem('power_comp',
@@ -46,34 +53,67 @@ class MotorMission(om.Group):
                                               P={'val': np.ones(n), 'units': 'kW'},
                                               T={'val': np.ones(n), 'units': 'kN*m'},
                                               RPM={'val': np.ones(n), 'units': 'rpm'}),
-                                  promotes_inputs=[("T", Dynamic.Mission.Motor.TORQUE),
+                                  promotes_inputs=[("T", Dynamic.Mission.TORQUE),
                                                    ("RPM", Aircraft.Motor.RPM)],
-                                  promotes_outputs=[("P", Dynamic.Mission.Motor.SHAFT_POWER)])
+                                  promotes_outputs=[("P", Dynamic.Mission.SHAFT_POWER)])
 
         motor_group.add_subsystem('energy_comp',
                                   om.ExecComp('P_elec = P / eff',
                                               P={'val': np.ones(n), 'units': 'kW'},
                                               P_elec={'val': np.ones(n), 'units': 'kW'},
                                               eff={'val': np.ones(n), 'units': None}),
-                                  promotes_inputs=[("P", Dynamic.Mission.Motor.SHAFT_POWER),
+                                  promotes_inputs=[("P", Dynamic.Mission.SHAFT_POWER),
                                                    ("eff", Dynamic.Mission.Motor.EFFICIENCY)],
-                                  promotes_outputs=[("P_elec", Dynamic.Mission.Motor.ELECTRIC_POWER)])
+                                  promotes_outputs=[("P_elec", Dynamic.Mission.ELECTRIC_POWER)])
 
-        motor_group.add_subsystem('torque_con',
-                                  om.ExecComp('torque_con = torque_max - torque_mission',
-                                              torque_con={'val': np.ones(
-                                                  n), 'units': 'kN*m'},
-                                              torque_max={'val': 1.0, 'units': 'kN*m'},
-                                              torque_mission={'val': np.ones(n), 'units': 'kN*m'}),
-                                  promotes_inputs=[('torque_mission', Dynamic.Mission.Motor.TORQUE),
-                                                   ('torque_max', Aircraft.Motor.TORQUE_MAX)],
-                                  promotes_outputs=[('torque_con', Dynamic.Mission.Motor.TORQUE_CON)])
+        # Gearbox goes here in future
+
+        # is this needed???
+        # this may be already covered by throttle constraints being from 0 - 1
+        # motor_group.add_subsystem('torque_con',
+        #                           om.ExecComp('torque_con = torque_max - torque_mission',
+        #                                       torque_con={'val': np.ones(
+        #                                           n), 'units': 'kN*m'},
+        #                                       torque_max={'val': 1.0, 'units': 'kN*m'},
+        #                                       torque_mission={'val': np.ones(n), 'units': 'kN*m'}),
+        #                           promotes_inputs=[('torque_mission', Dynamic.Mission.TORQUE),
+        #                                            ('torque_max', Aircraft.Motor.TORQUE_MAX)],
+        #                           promotes_outputs=[('torque_con', Dynamic.Mission.Motor.TORQUE_CON)])
 
         self.add_subsystem('motor_group', motor_group,
                            promotes_inputs=['*'],
                            promotes_outputs=[
                                '*',
-                               (Dynamic.Mission.Motor.TORQUE, Dynamic.Mission.Prop.TORQUE),
-                               (Dynamic.Mission.Motor.SHAFT_POWER,
+                               (Dynamic.Mission.TORQUE, Dynamic.Mission.Prop.TORQUE),
+                               (Dynamic.Mission.SHAFT_POWER,
                                 Dynamic.Mission.Prop.SHAFT_POWER)
+                           ])
+
+        # Determine the maximum power available at this flight condition
+        # this is used for excess power constraints
+        motor_group_max = om.Group()
+
+        # these two groups are the same as those above
+        motor_group_max.add_subsystem('motor_map_max', MotorMap(num_nodes=n),
+                                      promotes_inputs=[Dynamic.Mission.THROTTLE,
+                                                       Aircraft.Engine.SCALE_FACTOR,
+                                                       Aircraft.Motor.RPM],
+                                      promotes_outputs=[Dynamic.Mission.TORQUE,
+                                                        Dynamic.Mission.Motor.EFFICIENCY])
+
+        motor_group_max.add_subsystem('power_comp_max',
+                                      om.ExecComp('P = T * pi * RPM / 30',
+                                                  P={'val': np.ones(n), 'units': 'kW'},
+                                                  T={'val': np.ones(n), 'units': 'kN*m'},
+                                                  RPM={'val': np.ones(n), 'units': 'rpm'}),
+                                      promotes_inputs=[("T", Dynamic.Mission.TORQUE),
+                                                       ("RPM", Aircraft.Motor.RPM)],
+                                      promotes_outputs=[("P", Dynamic.Mission.SHAFT_POWER)])
+
+        self.add_subsystem('motor_group_max', motor_group_max,
+                           promotes_inputs=[
+                               '*', (Dynamic.Mission.THROTTLE, 'max_throttle')],
+                           promotes_outputs=[
+                               (Dynamic.Mission.SHAFT_POWER,
+                                Dynamic.Mission.SHAFT_POWER_MAX)
                            ])

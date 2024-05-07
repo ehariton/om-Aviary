@@ -1,19 +1,10 @@
 import aviary.api as av
-from aviary.subsystems.propulsion.motor.motor_variables import Aircraft, Dynamic, Mission
+from aviary.subsystems.propulsion.motor.motor_variables import Aircraft, Dynamic
 
 
 ExtendedMetaData = av.CoreMetaData
 
 ##### MOTOR VALUES #####
-
-av.add_meta_data(
-    Aircraft.Motor.COUNT,
-    units=None,
-    desc="Number of motors",
-    default_value=1,
-    option=True,
-    meta_data=ExtendedMetaData
-)
 
 av.add_meta_data(
     Aircraft.Motor.MASS,
@@ -34,7 +25,7 @@ av.add_meta_data(
 av.add_meta_data(
     Aircraft.Motor.TORQUE_MAX,
     units="N*m",
-    desc="Max torque value that can be output from a single motor",
+    desc="Max torque value that can be output from a single motor. Used to determine motor mass in pre-mission",
     meta_data=ExtendedMetaData
 )
 
@@ -49,23 +40,15 @@ av.add_meta_data(
 )
 
 av.add_meta_data(
-    Dynamic.Mission.Motor.ELECTRIC_POWER,
+    Dynamic.Mission.ELECTRIC_POWER,
     units="kW",
     desc="Power used by all the motors combined",
     default_value=None,
     meta_data=ExtendedMetaData
 )
 
-# av.add_meta_data(
-#     Mission.Motor.ELECTRIC_ENERGY,
-#     units="kW*h",
-#     desc="Energy used by all the motors combined throughout the whole phase/mission",
-#     default_value=None,
-#     meta_data=ExtendedMetaData
-# )
-
 av.add_meta_data(
-    Dynamic.Mission.Motor.SHAFT_POWER,
+    Dynamic.Mission.SHAFT_POWER,
     units="kW",
     desc="Power output from a single motor",
     default_value=None,
@@ -73,9 +56,27 @@ av.add_meta_data(
 )
 
 av.add_meta_data(
-    Dynamic.Mission.Motor.TORQUE,
+    Dynamic.Mission.TORQUE,
     units="N*m",
     desc="Motor torque",
+    default_value=None,
+    meta_data=ExtendedMetaData
+)
+
+# av.add_meta_data(
+#     Dynamic.Mission.Motor.TORQUE_CON,
+#     units="N*m",
+#     desc="Motor torque constraint to ensure torque in mission is less than torque_max. Only use if you don't know your torque_max a-priori",
+#     default_value=None,
+#     meta_data=ExtendedMetaData
+# )
+
+##### PROP VALUES #####
+
+av.add_meta_data(
+    Aircraft.Prop.RPM,
+    units="rpm",
+    desc="Prop RPM",
     default_value=None,
     meta_data=ExtendedMetaData
 )
@@ -84,14 +85,6 @@ av.add_meta_data(
     Dynamic.Mission.Prop.TORQUE,
     units="N*m",
     desc="Torque output to a single propellar shaft from a motor/turbine/gearbox",
-    default_value=None,
-    meta_data=ExtendedMetaData
-)
-
-av.add_meta_data(
-    Dynamic.Mission.Motor.TORQUE_CON,
-    units="N*m",
-    desc="Motor torque constraint to ensure torque in mission is less than torque_max",
     default_value=None,
     meta_data=ExtendedMetaData
 )

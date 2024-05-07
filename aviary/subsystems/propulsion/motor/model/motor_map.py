@@ -2,7 +2,7 @@ import numpy as np
 
 import openmdao.api as om
 
-from aviary.subsystems.propulsion.motor.motor_variables import Dynamic, Aircraft, Mission
+from aviary.subsystems.propulsion.motor.motor_variables import Dynamic, Aircraft
 
 
 motor_map = np.array([
@@ -45,12 +45,12 @@ class MotorMap(om.Group):
     Dynamic.Mission.THROTTLE : float (unitless) (0 to 1)
         The throttle command which will be translated into torque output from the engine
     Aircraft.Engine.SCALE_FACTOR : float (unitless) (positive) 
-    Mission.Motor.RPM : float (rpm) (0 to 6000)
+    Aircraft.Motor.RPM : float (rpm) (0 to 6000)
 
     Outputs
     ----------
-    Mission.Motor.TORQUE : float (positive)
-    Mission.Motor.EFFICIENCY : float (positive)
+    Dynamic.Mission.TORQUE : float (positive)
+    Dynamic.Mission.Motor.EFFICIENCY : float (positive)
 
     '''
 
@@ -101,6 +101,6 @@ class MotorMap(om.Group):
                                        T={'val': np.ones(n), 'units': 'N*m'},
                                        T_unscaled={'val': np.ones(n), 'units': 'N*m'},
                                        scale_factor={'val': 1, 'units': 'unitless'}),
-                           promotes=[("T", Dynamic.Mission.Motor.TORQUE),
+                           promotes=[("T", Dynamic.Mission.TORQUE),
                                      "T_unscaled",
                                      ("scale_factor", Aircraft.Engine.SCALE_FACTOR)])
