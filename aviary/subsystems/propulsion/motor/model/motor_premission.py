@@ -7,7 +7,7 @@ from aviary.subsystems.propulsion.motor.model.motor_map import MotorMap
 
 class MotorPreMission(om.Group):
     """
-    Calculate electric motor mass
+    Calculate electric motor mass for a single motor
     """
 
     def initialize(self):
@@ -40,12 +40,11 @@ class MotorPreMission(om.Group):
         # Motor mass relationship based on continuous torque rating for aerospace motors (Figure 10)
         # Propulsion Scaling Methods in the Era of Electric Flight - Duffy et. al.
         # AIAA Propulsion and Energy Forum, July 9-11, 2018
-        num_motors = self.options["aviary_inputs"].get_val(Aircraft.Motor.COUNT)
         self.add_subsystem('motor_mass',
-                           om.ExecComp('motor_mass = num_motors * (0.3151 * max_torque ** 0.748)',
+                           om.ExecComp('motor_mass = (0.3151 * max_torque ** 0.748)',
                                        motor_mass={'val': 1.0, 'units': 'kg'},
-                                       num_motors={'val': num_motors,
-                                                   'units': 'unitless'},
                                        max_torque={'val': 1.0, 'units': 'N*m'}),
                            promotes_inputs=[('max_torque', Aircraft.Motor.TORQUE_MAX)],
                            promotes_outputs=[('motor_mass', Aircraft.Motor.MASS)])
+
+        # TBD Gearbox mass calc goes here?

@@ -106,13 +106,11 @@ class TurbopropModel(EngineModel):
 
         input_rpm = False
         shp_model_mission = shp_model.build_mission(num_nodes, aviary_inputs, **kwargs)
-        if shp_model_mission is not None:
+        if shp_model_mission is not None:  # If power generation is seperate from propellar do this!
             turboprop_group.add_subsystem(shp_model.name,
                                           subsys=shp_model_mission,
                                           promotes_inputs=['*'],
-                                          promotes_outputs=['*',
-                                                            # (Dynamic.Mission.Motor.SHAFT_POWER, Dynamic.Mission.SHAFT_POWER),
-                                                            ])
+                                          promotes_outputs=['*'])
 
             # Add IVC just for max throttle
             ivc = om.IndepVarComp()
@@ -124,9 +122,10 @@ class TurbopropModel(EngineModel):
             turboprop_max_group.add_subsystem(f"{shp_model.name}_max",
                                               subsys=shp_model_mission_max,
                                               promotes_inputs=['*',
-                                                               #    (Dynamic.Mission.THROTTLE, "throttle_max"),
+                                                               (Dynamic.Mission.THROTTLE,
+                                                                "throttle_max"),
                                                                ],
-                                              promotes_outputs=[(Dynamic.Mission.Motor.SHAFT_POWER, "shaft_power_max")])
+                                              promotes_outputs=[(Dynamic.Mission.Prop.SHAFT_POWER, "shaft_power_max")])
             input_rpm = True
 
         # ensure uncorrected shaft horsepower is avaliable
@@ -141,7 +140,7 @@ class TurbopropModel(EngineModel):
                                                                Dynamic.Mission.TEMPERATURE,
                                                                Dynamic.Mission.STATIC_PRESSURE,
                                                                Dynamic.Mission.MACH],
-                                              promotes_outputs=[('uncorrected_data', Dynamic.Mission.SHAFT_POWER)]),
+                                              promotes_outputs=[('uncorrected_data', Dynamic.Mission.Prop.SHAFT_POWER)]),
 
         # must assume user-provide propeller group has everything it needs
         if prop_model is not None and prop_model != 'hamilton_standard':
@@ -189,7 +188,7 @@ class TurbopropModel(EngineModel):
                                                                    num_nodes=num_nodes,
                                                                    input_rpm=input_rpm),
                                               promotes_inputs=[
-                                                  '*', (Dynamic.Mission.SHAFT_POWER, 'shaft_power_max')],
+                                                  '*', (Dynamic.Mission.Prop.SHAFT_POWER, 'shaft_power_max')],
                                               promotes_outputs=[('propeller_thrust', Dynamic.Mission.THRUST_MAX)])
 
         thrust_adder = om.ExecComp('turboprop_thrust=turboshaft_thrust+propeller_thrust',

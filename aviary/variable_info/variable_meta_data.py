@@ -6338,14 +6338,14 @@ add_meta_data(
 )
 
 add_meta_data(
-    Dynamic.Mission.SHAFT_POWER,
+    Dynamic.Mission.Prop.SHAFT_POWER,
     meta_data=_MetaData,
     historical_name={"GASP": 'SHP',
                      "FLOPS": None,
                      "LEAPS1": None
                      },
     units='hp',
-    desc='The shaft horsepower'
+    desc='The shaft horsepower going into a single propellar'
 )
 
 add_meta_data(

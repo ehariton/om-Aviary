@@ -307,7 +307,7 @@ class TurbopropTest(unittest.TestCase):
 
 
 @unittest.skip("Skipping until engines are no longer required to always output all values")
-@use_tempdirs
+#@use_tempdirs
 class ElectropropTest(unittest.TestCase):
     def test_electroprop(self):
         phase_info = {

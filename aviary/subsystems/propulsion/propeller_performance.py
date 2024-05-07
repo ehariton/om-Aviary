@@ -228,7 +228,7 @@ class PropellerPerformance(om.Group):
                 Dynamic.Mission.VELOCITY,
                 Dynamic.Mission.PROPELLER_TIP_SPEED,
                 Aircraft.Engine.PROPELLER_DIAMETER,
-                Dynamic.Mission.SHAFT_POWER,
+                Dynamic.Mission.Prop.SHAFT_POWER,
             ],
             promotes_outputs=[
                 "power_coefficient",

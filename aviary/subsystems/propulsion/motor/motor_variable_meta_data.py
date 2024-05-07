@@ -56,13 +56,13 @@ av.add_meta_data(
     meta_data=ExtendedMetaData
 )
 
-av.add_meta_data(
-    Mission.Motor.ELECTRIC_ENERGY,
-    units="kW*h",
-    desc="Energy used by all the motors combined throughout the whole phase/mission",
-    default_value=None,
-    meta_data=ExtendedMetaData
-)
+# av.add_meta_data(
+#     Mission.Motor.ELECTRIC_ENERGY,
+#     units="kW*h",
+#     desc="Energy used by all the motors combined throughout the whole phase/mission",
+#     default_value=None,
+#     meta_data=ExtendedMetaData
+# )
 
 av.add_meta_data(
     Dynamic.Mission.Motor.SHAFT_POWER,
@@ -76,6 +76,14 @@ av.add_meta_data(
     Dynamic.Mission.Motor.TORQUE,
     units="N*m",
     desc="Motor torque",
+    default_value=None,
+    meta_data=ExtendedMetaData
+)
+
+av.add_meta_data(
+    Dynamic.Mission.Prop.TORQUE,
+    units="N*m",
+    desc="Torque output to a single propellar shaft from a motor/turbine/gearbox",
     default_value=None,
     meta_data=ExtendedMetaData
 )

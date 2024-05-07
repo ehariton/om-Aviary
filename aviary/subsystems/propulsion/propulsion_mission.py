@@ -95,7 +95,7 @@ class PropulsionMission(om.Group):
             units='degR'
         )
         perf_mux.add_var(
-            Dynamic.Mission.SHAFT_POWER,
+            Dynamic.Mission.Prop.SHAFT_POWER,
             shape=(nn,),
             axis=1,
             units='hp'
@@ -138,8 +138,8 @@ class PropulsionMission(om.Group):
 
             try:
                 if engine.use_shp:
-                    self.connect(engine.name + '.' + Dynamic.Mission.SHAFT_POWER,
-                                 'vectorize_performance.' + Dynamic.Mission.SHAFT_POWER + '_' + str(i))
+                    self.connect(engine.name + '.' + Dynamic.Mission.Motor.SHAFT_POWER,
+                                 'vectorize_performance.' + Dynamic.Mission.Prop.SHAFT_POWER + '_' + str(i))
                     self.connect(engine.name + '.' + Dynamic.Mission.SHAFT_POWER_CORRECTED,
                                  'vectorize_performance.' + Dynamic.Mission.SHAFT_POWER_CORRECTED + '_' + str(i))
             except AttributeError:  # engine does not have flag

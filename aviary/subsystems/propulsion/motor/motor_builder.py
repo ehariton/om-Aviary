@@ -7,10 +7,11 @@ from aviary.subsystems.propulsion.motor.motor_variable_meta_data import Extended
 
 class MotorBuilder(SubsystemBuilderBase):
     '''
-    Define the builder for a motor subsystem that provides methods to define the motor subsystem's states, design variables, fixed values, initial guesses, and mass names.
+    Define the builder for a single motor subsystem that provides methods to define the motor subsystem's states, design variables, fixed values, initial guesses, and mass names.
 
     It also provides methods to build OpenMDAO systems for the pre-mission and mission computations of the subsystem, to get the constraints for the subsystem, and to preprocess the inputs for the subsystem.
 
+    This is meant to be computations for a single motor, so there is no notion of "num_motors" in this code.
 
     Attributes
     ----------
@@ -115,12 +116,12 @@ class MotorBuilder(SubsystemBuilderBase):
         This method returns a dictionary of constraints for the motor subsystem.
         '''
         if self.include_constraints:
-            # TBD
             constraints = {
                 Dynamic.Mission.Motor.TORQUE_CON: {
                     'upper': 0.0,
                     'type': 'path'
                 }
+                # TBD Gearbo torque constraint
             }
         else:
             constraints = {}
@@ -254,7 +255,6 @@ class MotorBuilder(SubsystemBuilderBase):
             A list of variable names for the motor subsystem.
         '''
 
-        return [Dynamic.Mission.Motor.TORQUE,
-                Dynamic.Mission.Motor.SHAFT_POWER,
-                Dynamic.Mission.Motor.ELECTRIC_POWER,
-                Mission.Motor.ELECTRIC_ENERGY]
+        return [Dynamic.Mission.Prop.TORQUE,
+                Dynamic.Mission.Prop.SHAFT_POWER,
+                Dynamic.Mission.ELECTRIC_POWER]  # we're assuming we have a single motor

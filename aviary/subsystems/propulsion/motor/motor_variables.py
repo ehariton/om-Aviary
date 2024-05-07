@@ -15,6 +15,11 @@ class Aircraft(av_Aircraft):
         RPM = "aircraft:motor:rpm"
         TORQUE_MAX = "aircraft:motor:torque_max"
 
+    class Gearbox:
+        GEAR_RATIO = "aircraft:gearbox:ratio"
+        MASS = "aircraft:gearbox:mass"
+        TORQUE_MAX = "aircraft:gearbox:torque_max"
+
 # ---------------------------
 # Mission data hierarchy
 # ---------------------------
@@ -30,6 +35,16 @@ class Dynamic(av_Dynamic):
             SHAFT_POWER = "dynamic:mission:motor:power_out"
             TORQUE = "dynamic:mission:motor:torque"
             TORQUE_CON = "Dynamic.Mission.Motor.TORQUE_CON"
+
+        class Gearbox():
+            EFFICIENCY = "dynamic:mission:gearbox:efficiency"
+            SHAFT_POWER_IN = "dynamic:mission:gearbox:power_in"
+            SHAFT_POWER_OUT = "dynamic:mission:gearbox:power_out"
+            TORQUE_IN = "dynamic:mission:gearbox:torque_in"
+            TORQUE_OUT = "dynamic:mission:gearbox:torque_out"
+
+        class Prop(av_Dynamic.Mission.Prop):
+            TORQUE = "dynamic:mission:prop:torque"
 
 
 class Mission(av_Mission):

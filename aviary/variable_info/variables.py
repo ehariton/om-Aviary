@@ -618,7 +618,6 @@ class Dynamic:
         NOX_RATE_TOTAL = 'nox_rate_total'
         PERCENT_ROTOR_RPM_CORRECTED = 'percent_rotor_rpm_corrected'
         PROPELLER_TIP_SPEED = 'propeller_tip_speed'
-        SHAFT_POWER = 'shaft_power'
         SHAFT_POWER_CORRECTED = 'shaft_power_corrected'
         SPECIFIC_ENERGY = 'specific_energy'
         SPECIFIC_ENERGY_RATE = 'specific_energy_rate'
@@ -634,6 +633,10 @@ class Dynamic:
         THRUST_TOTAL = 'thrust_net_total'
         VELOCITY = 'velocity'
         VELOCITY_RATE = 'velocity_rate'
+
+        class Prop:
+            SHAFT_POWER = 'dynamic:mission:prop:shaft_power'
+            # TBD move all prop items from Dynamic.Mission here!
 
 
 class Mission:
