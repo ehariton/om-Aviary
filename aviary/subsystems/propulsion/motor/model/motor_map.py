@@ -85,7 +85,7 @@ class MotorMap(om.Group):
                            om.ExecComp('T_unscaled = T_max * throttle',
                                        T_unscaled={'val': np.ones(n), 'units': 'N*m'},
                                        T_max={'val': torque_vals[-1], 'units': 'N*m'},
-                                       throttle={'val': np.ones(n), 'units': 'unitless'}),
+                                       throttle={'val': np.ones(n), 'units': None}),
                            promotes=["T_unscaled",
                                      ("throttle", Dynamic.Mission.THROTTLE)])
 

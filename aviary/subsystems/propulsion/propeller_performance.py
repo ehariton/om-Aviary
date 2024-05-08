@@ -175,7 +175,7 @@ class PropellerPerformance(om.Group):
                     has_diag_partials=True,
                 ),
                 promotes_inputs=[
-                    ('rpm', Aircraft.Motor.RPM),
+                    ('rpm', Aircraft.Prop.RPM),
                     ('diameter', Aircraft.Engine.PROPELLER_DIAMETER),
                 ],
                 promotes_outputs=[
