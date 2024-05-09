@@ -2,7 +2,7 @@ import openmdao.api as om
 import numpy as np
 
 from aviary.utils.aviary_values import AviaryValues
-from aviary.subsystems.propulsion.motor.motor_variables import Aircraft, Mission, Dynamic
+from aviary.subsystems.propulsion.motor.motor_variables import Aircraft, Dynamic
 from aviary.subsystems.propulsion.hamilton_standard import HamiltonStandard, PostHamiltonStandard, PreHamiltonStandard
 
 

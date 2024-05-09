@@ -149,7 +149,6 @@ class MotorBuilder(SubsystemBuilderBase):
         '''
 
         DVs = {
-            # TBD do we need this?
             Dynamic.Mission.THROTTLE: {
                 'units': 'unitless',
                 'lower': 0.0,
@@ -203,21 +202,21 @@ class MotorBuilder(SubsystemBuilderBase):
         '''
 
         initial_guess_dict = {
-            Dynamic.Mission.THROTTLE: {
-                'units': 'unitless',
-                'type': 'control',
-                'val': 0.5,
-            },
-            Aircraft.Engine.SCALE_FACTOR: {
-                'units': 'unitless',
-                'type': 'parameter',
-                'val': 1.0,
-            },
-            Aircraft.Motor.RPM: {
-                'units': 'rpm',
-                'type': 'parameter',
-                'val': 4000.0,  # based on our map
-            },
+            # Dynamic.Mission.THROTTLE: {
+            #     'units': 'unitless',
+            #     'type': 'control',
+            #     'val': 0.5,
+            # },
+            # Aircraft.Engine.SCALE_FACTOR: {
+            #     'units': 'unitless',
+            #     'type': 'parameter',
+            #     'val': 1.0,
+            # },
+            # Aircraft.Motor.RPM: {
+            #     'units': 'rpm',
+            #     'type': 'parameter',
+            #     'val': 4000.0,  # based on our map
+            # },
         }
 
         return initial_guess_dict

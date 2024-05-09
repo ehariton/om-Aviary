@@ -6,7 +6,7 @@ from aviary.subsystems.propulsion.engine_deck import EngineDeck
 from aviary.subsystems.propulsion.utils import EngineModelVariables
 from aviary.utils.named_values import NamedValues
 from aviary.utils.aviary_values import AviaryValues
-from aviary.subsystems.propulsion.motor.motor_variables import Dynamic, Aircraft, Mission
+from aviary.subsystems.propulsion.motor.motor_variables import Dynamic, Aircraft
 from aviary.subsystems.propulsion.propeller_performance import PropellerPerformance
 from aviary.subsystems.propulsion.utils import UncorrectData
 from aviary.mission.gasp_based.flight_conditions import FlightConditions
@@ -110,23 +110,23 @@ class TurbopropModel(EngineModel):
             turboprop_group.add_subsystem(shp_model.name,
                                           subsys=shp_model_mission,
                                           promotes_inputs=[
-                                              '*', (Dynamic.Mission.THRUST, 'turboshaft_thrust')],
-                                          promotes_outputs=['*'])
+                                              '*'],
+                                          promotes_outputs=['*', (Dynamic.Mission.THRUST, 'turboshaft_thrust')])  # will get shaft_power_max from here
 
-            # Add IVC just for max throttle
-            ivc = om.IndepVarComp()
-            ivc.add_output("throttle_max", val=np.ones(num_nodes), units='unitless')
-            turboprop_max_group.add_subsystem('ivc', ivc, promotes=['*'])
+            # # Add IVC just for max throttle
+            # ivc = om.IndepVarComp()
+            # ivc.add_output("throttle_max", val=np.ones(num_nodes), units='unitless')
+            # turboprop_max_group.add_subsystem('ivc', ivc, promotes=['*'])
 
-            shp_model_mission_max = shp_model.build_mission(
-                num_nodes, aviary_inputs, **kwargs)
-            turboprop_max_group.add_subsystem(f"{shp_model.name}_max",
-                                              subsys=shp_model_mission_max,
-                                              promotes_inputs=['*',
-                                                               (Dynamic.Mission.THROTTLE,
-                                                                "throttle_max"),
-                                                               ],
-                                              promotes_outputs=[(Dynamic.Mission.Prop.SHAFT_POWER, "shaft_power_max")])
+            # shp_model_mission_max = shp_model.build_mission(
+            #     num_nodes, aviary_inputs, **kwargs)
+            # turboprop_max_group.add_subsystem(f"{shp_model.name}_max",
+            #                                   subsys=shp_model_mission_max,
+            #                                   promotes_inputs=['*',
+            #                                                    (Dynamic.Mission.THROTTLE,
+            #                                                     "throttle_max"),
+            #                                                    ],
+            #                                   promotes_outputs=[(Dynamic.Mission.Prop.SHAFT_POWER, "shaft_power_max")])
             input_rpm = True
 
         # ensure uncorrected shaft horsepower is avaliable
@@ -191,9 +191,10 @@ class TurbopropModel(EngineModel):
                                    propeller_thrust={'val': np.zeros(num_nodes), 'units': 'lbf'})
 
         turboprop_group.add_subsystem('turboprop_max_group', turboprop_max_group,
-                                      promotes_inputs=['*']
-                                      promotes_outputs=[
-                                          Dynamic.Mission.THRUST_MAX])
+                                      promotes_inputs=['*'],
+                                      promotes_outputs=[Dynamic.Mission.THRUST_MAX])
+
+        # TBD do we still need this since we removed duplicated flight conditions??
         turboprop_max_group.set_input_defaults(
             Dynamic.Mission.TEMPERATURE, 288.15*np.ones(num_nodes), units='K')
         turboprop_max_group.set_input_defaults(

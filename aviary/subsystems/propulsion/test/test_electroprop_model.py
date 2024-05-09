@@ -12,7 +12,7 @@ from aviary.interface.utils.markdown_utils import round_it
 from aviary.utils.preprocessors import preprocess_propulsion
 from aviary.utils.functions import get_path
 from aviary.variable_info.variables import Settings
-from aviary.subsystems.propulsion.motor.motor_variables import Aircraft, Dynamic, Mission
+from aviary.subsystems.propulsion.motor.motor_variables import Aircraft, Dynamic
 from aviary.variable_info.enums import SpeedType, Verbosity
 from aviary.variable_info.options import get_option_defaults
 from aviary.subsystems.subsystem_builder_base import SubsystemBuilderBase
@@ -25,7 +25,7 @@ class ElectropropTest(unittest.TestCase):
 
     def prepare_model(self, test_points=[(0, 0, 0), (0, 0, 1)], prop_model=None):
         options = get_option_defaults()
-        options.set_val(Aircraft.Motor.COUNT, 1)
+        # options.set_val(Aircraft.Motor.COUNT, 1)
 
         num_nodes = len(test_points)
 

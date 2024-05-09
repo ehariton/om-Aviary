@@ -118,9 +118,11 @@ class MotorMission(om.Group):
                                 Dynamic.Mission.SHAFT_POWER_MAX)
                            ])
 
-        self.add_subsystem('gearbox_PRM', om.ExecComp('RPM_out = RPM_in',
+        self.add_subsystem('gearbox_PRM', om.ExecComp('RPM_out = gear_ratio * RPM_in',
                                                       RPM_out={'val': np.ones(
                                                           n), 'units': 'rpm'},
+                                                      gear_ratio={
+                                                          'val': 1.0, 'units': None},
                                                       RPM_in={'val': np.ones(n), 'units': 'rpm'}),
                            promotes_inputs=[('RPM_in', Aircraft.Motor.RPM)],
                            promotes_outputs=[('RPM_out', Aircraft.Prop.RPM)])
