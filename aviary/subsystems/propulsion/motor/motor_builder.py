@@ -69,7 +69,7 @@ class MotorBuilder(SubsystemBuilderBase):
 
     def get_linked_variables(self):
         '''
-        Return the list of linked variables for the motor subsystem.
+        Return the list of variables linked between phases for the motor subsystem.
         '''
         return []
 
@@ -130,7 +130,7 @@ class MotorBuilder(SubsystemBuilderBase):
 
     def get_design_vars(self):
         '''
-        Return a dictionary of design variables for the battery subsystem.
+        Return a dictionary of design variables for the motor subsystem.
 
         Returns
         -------
@@ -164,6 +164,12 @@ class MotorBuilder(SubsystemBuilderBase):
                 'lower': 0.1,
                 'upper': 20000
             },
+            Aircraft.Gearbox.GEAR_RATIO: {
+                'val': 1.0,
+                'units': None,
+                'lower': 1.0,
+                'upper': 1.0,
+            }
         }
 
         return DVs
@@ -185,7 +191,8 @@ class MotorBuilder(SubsystemBuilderBase):
             - any additional keyword arguments required by OpenMDAO for the variable.
         '''
 
-        parameters_dict = {}
+        parameters_dict = {
+        }
 
         return parameters_dict
 
@@ -230,7 +237,8 @@ class MotorBuilder(SubsystemBuilderBase):
         mass_names : list
             A list of names for the motor subsystem.
         '''
-        return [Aircraft.Motor.MASS]
+        return [Aircraft.Motor.MASS,
+                Aircraft.Gearbox.MASS]
 
     def preprocess_inputs(self, aviary_inputs):
         '''

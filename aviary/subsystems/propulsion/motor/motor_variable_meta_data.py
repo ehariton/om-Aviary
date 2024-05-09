@@ -88,3 +88,28 @@ av.add_meta_data(
     default_value=None,
     meta_data=ExtendedMetaData
 )
+
+####### GEARBOX VALUES ######
+av.add_meta_data(
+    Aircraft.Gearbox.GEAR_RATIO,
+    units=None,
+    desc="The ratio of the RPM_out divided by the RPM_in for the gearbox.",
+    default_value=None,
+    meta_data=ExtendedMetaData
+)
+
+av.add_meta_data(
+    Aircraft.Gearbox.MASS,
+    units='kg',
+    desc="The mass of the gearbox.",
+    default_value=None,
+    meta_data=ExtendedMetaData
+)
+
+av.add_meta_data(
+    Dynamic.Mission.Gearbox.EFFICIENCY,
+    units=None,
+    desc="The efficiency of the gearbox during the mission",
+    default_value=1.0,
+    meta_data=ExtendedMetaData
+)

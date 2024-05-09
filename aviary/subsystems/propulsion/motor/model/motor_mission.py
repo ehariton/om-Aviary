@@ -52,7 +52,7 @@ class MotorMission(om.Group):
                                   om.ExecComp('P = T * pi * RPM / 30',
                                               P={'val': np.ones(n), 'units': 'kW'},
                                               T={'val': np.ones(n), 'units': 'kN*m'},
-                                              RPM={'val': np.ones(n), 'units': 'rpm'}),
+                                              RPM={'val': np.ones(n), 'units': 'rpm'}),  # fixed RPM system
                                   promotes_inputs=[("T", Dynamic.Mission.TORQUE),
                                                    ("RPM", Aircraft.Motor.RPM)],
                                   promotes_outputs=[("P", Dynamic.Mission.SHAFT_POWER)])
@@ -84,9 +84,8 @@ class MotorMission(om.Group):
                            promotes_inputs=['*'],
                            promotes_outputs=[
                                '*',
-                               (Dynamic.Mission.TORQUE, Dynamic.Mission.Prop.TORQUE),
                                (Dynamic.Mission.SHAFT_POWER,
-                                Dynamic.Mission.Prop.SHAFT_POWER)
+                                Dynamic.Mission.Prop.SHAFT_POWER),  # assumes no power loss through gearbox
                            ])
 
         # Determine the maximum power available at this flight condition
@@ -95,10 +94,10 @@ class MotorMission(om.Group):
 
         # these two groups are the same as those above
         motor_group_max.add_subsystem('motor_map_max', MotorMap(num_nodes=n),
-                                      promotes_inputs=[Dynamic.Mission.THROTTLE,
+                                      promotes_inputs=[(Dynamic.Mission.THROTTLE, 'max_throttle'),
                                                        Aircraft.Engine.SCALE_FACTOR,
                                                        Aircraft.Motor.RPM],
-                                      promotes_outputs=[Dynamic.Mission.TORQUE,
+                                      promotes_outputs=[(Dynamic.Mission.TORQUE, 'motor_max_torque'),
                                                         Dynamic.Mission.Motor.EFFICIENCY])
 
         motor_group_max.add_subsystem('power_comp_max',
@@ -106,23 +105,20 @@ class MotorMission(om.Group):
                                                   P={'val': np.ones(n), 'units': 'kW'},
                                                   T={'val': np.ones(n), 'units': 'kN*m'},
                                                   RPM={'val': np.ones(n), 'units': 'rpm'}),
-                                      promotes_inputs=[("T", Dynamic.Mission.TORQUE),
+                                      promotes_inputs=[("T", 'motor_max_torque'),
                                                        ("RPM", Aircraft.Motor.RPM)],
-                                      promotes_outputs=[("P", Dynamic.Mission.SHAFT_POWER)])
+                                      promotes_outputs=[("P", Dynamic.Mission.SHAFT_POWER_MAX)])
 
         self.add_subsystem('motor_group_max', motor_group_max,
-                           promotes_inputs=[
-                               '*', (Dynamic.Mission.THROTTLE, 'max_throttle')],
-                           promotes_outputs=[
-                               (Dynamic.Mission.SHAFT_POWER,
-                                Dynamic.Mission.SHAFT_POWER_MAX)
-                           ])
+                           promotes_inputs=['*', 'max_throttle'],
+                           promotes_outputs=[Dynamic.Mission.SHAFT_POWER_MAX])
 
-        self.add_subsystem('gearbox_PRM', om.ExecComp('RPM_out = gear_ratio * RPM_in',
-                                                      RPM_out={'val': np.ones(
-                                                          n), 'units': 'rpm'},
-                                                      gear_ratio={
-                                                          'val': 1.0, 'units': None},
-                                                      RPM_in={'val': np.ones(n), 'units': 'rpm'}),
-                           promotes_inputs=[('RPM_in', Aircraft.Motor.RPM)],
-                           promotes_outputs=[('RPM_out', Aircraft.Prop.RPM)])
+        # determine torque available at the prop
+        self.add_subsystem('gearbox_comp',
+                           om.ExecComp('T = P / (pi * RPM) * 30',
+                                       P={'val': np.ones(n), 'units': 'kW'},
+                                       T={'val': np.ones(n), 'units': 'kN*m'},
+                                       RPM={'val': np.ones(n), 'units': 'rpm'}),
+                           promotes_inputs=[("P", Dynamic.Mission.Prop.SHAFT_POWER),
+                                            ("RPM", Aircraft.Prop.RPM)],
+                           promotes_outputs=[("T", Dynamic.Mission.Prop.TORQUE),])

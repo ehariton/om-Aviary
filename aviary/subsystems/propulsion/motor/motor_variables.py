@@ -14,7 +14,7 @@ class Aircraft(av_Aircraft):
         TORQUE_MAX = "aircraft:motor:torque_max"
 
     class Gearbox:
-        GEAR_RATIO = "aircraft:gearbox:ratio"
+        GEAR_RATIO = "aircraft:gearbox:gear_ratio"
         MASS = "aircraft:gearbox:mass"
         TORQUE_MAX = "aircraft:gearbox:torque_max"
 
