@@ -10,6 +10,7 @@ class TestMotor(TestSubsystemBuilderBase):
     def setUp(self):
         self.subsystem_builder = MotorBuilder()
         self.aviary_values = AviaryValues()
+        self.aviary_values.set_val(Aircraft.Gearbox.GEAR_RATIO, 1)
 
 
 if __name__ == '__main__':
