@@ -164,6 +164,11 @@ class MotorBuilder(SubsystemBuilderBase):
                 'lower': 0.1,
                 'upper': 20000
             },
+            Aircraft.Gearbox.GEAR_RATIO: {
+                'units': None,
+                'lower': 1.0,
+                'upper': 1.0,
+            }
 
         }
 
