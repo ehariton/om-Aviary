@@ -7,48 +7,6 @@
  
 
  $INGASP
- AS=1.,		! Number of aisles in the cabin
- AR=11.03,	! Wing aspect ratio
- ARHT=4.26,	! Horizontal tail aspect ratio
- ARVT=1.84,	! Vertical tail aspect ratio
- BOELTV=1.9409,	! wing span/vertical tail moment arm (if VBARVX is input)
- COELTH=.1844,	! wing chord/horizontal tail moment arm (if VBARHX is input)
- DLMC4=26.34,	! sweep of wing quarter chord, degrees
- DWPQCV=29.95,  ! sweep of horizontal tail
- DWPQCH=34.70,	! vertical tail quarter chord sweep in degrees if LCWING <> 0
- ELPC=11.7,	! length of pilot compartment in feet (4.44)
- ELODN=0.845,	! length to diameter ratio of nose cone of fuselage (2)
- ELODT=3.368,	! length to diameter ratio of tail cone of fuselage (3.2)
- HCK=4.25,	! mean fuselage cabin diameter minus mean fuselage nose diameter in feet (2.47)
- HQBWGLT=0.0,   ! winglet height-to-span ratio
- HTG=6.5,	! wing height about ground during ground run in feet (3.0)
- HWING=0.0,     ! wing location on fuselage =0, low wing; =1 high wing
- PAX=96, !104.,	! number of passenger seats excluding crew
- PS=31,	! seat pitch in inches
- SAB=4.,	! seats abreast in fuselage
- SAH=0., 	! horizontal tail location on vertical tail: 0: low tail, 1: T-tail
- SCFAC=0.025,	! shift in drag divergence Mach number due to supercritical design (0.)
- SF_FAC=1.00,	! Fuselage Wetted Area Adjustment factor (1.); if SF_FAC > 10., input as Fuselage Wetted area (ft^2)
- SLM=.3010,	! wing taper ratio
- SLMH=.381,	! taper ratio of horizontal tail
- SLMV=0.267,	! taper ratio of vertical tail
- SLMWGLT=0.,    ! winglet taper ratio
- TCHT=.107,	! horizontal tail root thickness to chord ratio
- TCR=0.1125,	! wing root thickness to chord ratio
- TCT=.12, 	! wing tip thickness to chord ratio
- TCVT=.130,	! Vertical tail root thickness to chord ratio
- VBARHX=1.2266,	! Hz tail volume coefficient (default function of fus length and diameter)
- VBARVX=0.08105,	! vertical tail volume coefficient (default function of fuselage length and diameter)
- WAS=19.,	! aisle width, in.
- WS=24.0, 	! seat width, in
- YMG=0.199,  	! span fraction location of main gear on wing    0: on fuselage   1: at tip
- YP=.272,	! span fraction location of engines on wing    0: on fuselage   1: at tip
- XLQDE=1.505,	! nacelle length to diameter ratio, KNAC=0 or 1
- XWQLF=0.463,	! Distance from Nose to Wing Aerodynamic Center over Fuselage Length (0.40 
- ALPHL0=-1.2,	! zero lift angle of attack in degrees
- CKF=1.45,	! fuselage drag form factor (numerical function of fuselage fineness ratio)
- CKW=1.45,	! wing form factor (numerical function of TCR and TCT)
- CKF=1.55,	! Fuselage
  CKW=1.55,       ! Wing
  CKI=1.25,	! Wing/Fuselage Interference Factor (0.0, i.e No interference drag)
  CKN=1.5,	! nacelle form factor (numerical function of nacelle fineness ratio)
@@ -65,14 +23,7 @@
  BTEOB=0.863, 	! ratio of flap span to wing span
  CFOC=0.15, 	! flap chord to wing chord ratio
  CLEOC=.10,	! ratio of leading edge device chord to wing chord (0 for no LED)
- DCDOTE=0.10, 	! drag coeff increment due to optimally deflected TE flaps
- DCLMLE=0.93,   ! Ref. Delta CL L.E.
- DELLEO=20., 	! optimal deflection for leading edge device degrees (45)
- DELTEO=20.,    ! Opt.T.E.DEFL(deg)
- DFLPTO=5.,	! takeoff flap deflection, degrees
- DELLED=10.,	! leading edge device deflection, degrees (0) when?
- DCLMTE=1.5,	! lift coefficient increment due to optimally deflected TE flaps
- DFLPLD=40., 	! landing flap deflection, degrees
+fdsafdsafdsafdsafdsa
  FLAPN=2., 	! number of flap segments per wing panel (1)
  ! JFLTYP 1:plain flap, 2:split flap, 3:single slotted flap (default), 4:double slotted flap
  !        5:triple slotted flap, 6:Fowler flap, 7:double slotted Fowler flap
