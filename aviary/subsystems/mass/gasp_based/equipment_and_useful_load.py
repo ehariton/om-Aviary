@@ -12,10 +12,6 @@ def sig(x):
     return 1 / (1 + np.exp(-100 * x))
 
 
-def dsig(x):
-    return 100 * np.exp(-100 * x) / (np.exp(-100 * x) + 1) ** 2
-
-
 class EquipAndUsefulLoadMass(om.ExplicitComponent):
     def initialize(self):
 
