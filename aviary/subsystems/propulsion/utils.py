@@ -23,22 +23,23 @@ from aviary.variable_info.variables import Aircraft
 class EngineModelVariables(Enum):
     """
     Define constants that map to supported variable names in an engine model.
-    """
-    MACH = auto()
-    ALTITUDE = auto()
-    THROTTLE = auto()
-    HYBRID_THROTTLE = auto()
-    THRUST = auto()
-    TAILPIPE_THRUST = auto()
-    GROSS_THRUST = auto()
-    SHAFT_POWER = auto()
-    SHAFT_POWER_CORRECTED = auto()
-    RAM_DRAG = auto()
-    FUEL_FLOW = auto()
-    ELECTRIC_POWER_IN = auto()
-    NOX_RATE = auto()
-    TEMPERATURE_T4 = auto()
-    TORQUE = auto()
+    '''
+
+    MACH = Dynamic.Mission.MACH
+    ALTITUDE = Dynamic.Mission.ALTITUDE
+    THROTTLE = Dynamic.Mission.THROTTLE
+    HYBRID_THROTTLE = Dynamic.Mission.HYBRID_THROTTLE
+    THRUST = Dynamic.Mission.THRUST
+    TAILPIPE_THRUST = 'tailpipe_thrust'
+    GROSS_THRUST = 'gross_thrust'
+    SHAFT_POWER = Dynamic.Mission.SHAFT_POWER
+    SHAFT_POWER_CORRECTED = 'shaft_power_corrected'
+    RAM_DRAG = 'ram_drag'
+    FUEL_FLOW = Dynamic.Mission.FUEL_FLOW_RATE
+    ELECTRIC_POWER_IN = Dynamic.Mission.ELECTRIC_POWER_IN
+    NOX_RATE = Dynamic.Mission.NOX_RATE
+    TEMPERATURE_T4 = Dynamic.Mission.TEMPERATURE_T4
+    TORQUE = Dynamic.Mission.TORQUE
     # EXIT_AREA = auto()
 
 
@@ -69,13 +70,13 @@ def convert_geopotential_altitude(altitude):
 
     Parameters
     ----------
-    altitude_list : <(float, list of floats)>
-        geopotential altitudes (in ft) to be converted.
+    altitude_list: < (float, list of floats) >
+        geopotential altitudes ( in ft) to be converted.
 
     Returns
     ----------
-    altitude_list : <list of floats>
-        geometric altitudes (ft).
+    altitude_list: < list of floats >
+    geometric altitudes(ft).
     """
     try:
         iter(altitude)
@@ -120,13 +121,13 @@ def build_engine_deck(aviary_options: AviaryValues, meta_data=_MetaData):
 
     Parameter
     ----------
-    aviary_options : AviaryValues
-        Options to use in creation of EngineDecks.
+    aviary_options: AviaryValues
+    Options to use in creation of EngineDecks.
 
     Returns
     ----------
-    engine_models : <list of EngineDecks>
-        List of EngineDecks created using provided aviary_options.
+    engine_models: < list of EngineDecks >
+    List of EngineDecks created using provided aviary_options.
     """
 
     # Required engine vars include one setting from Mission.Summary.
