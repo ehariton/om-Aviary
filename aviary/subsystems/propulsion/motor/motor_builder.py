@@ -74,11 +74,6 @@ class MotorBuilder(SubsystemBuilderBase):
                 'lower': 0.001,
                 'upper': None
             },
-            Aircraft.Engine.Gearbox.GEAR_RATIO: {
-                'units': None,
-                'lower': 1.0,
-                'upper': 1.0,
-            }
         }
 
         return DVs
@@ -103,8 +98,7 @@ class MotorBuilder(SubsystemBuilderBase):
         mass_names : list
             A list of names for the motor subsystem.
         '''
-        return [Aircraft.Engine.Motor.MASS,
-                Aircraft.Engine.Gearbox.MASS]
+        return [Aircraft.Engine.Motor.MASS]
 
     def get_outputs(self):
         '''

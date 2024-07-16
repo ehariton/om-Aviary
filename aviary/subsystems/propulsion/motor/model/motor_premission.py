@@ -33,7 +33,7 @@ class MotorPreMission(om.Group):
         self.add_subsystem('motor_map', MotorMap(num_nodes=1),
                            promotes_inputs=[Aircraft.Engine.SCALE_FACTOR,
                                             Dynamic.Mission.THROTTLE,
-                                            Dynamic.Mission.RPM],
+                                            Dynamic.Mission.RPM],  # TODO this RPM should be a single value
                            promotes_outputs=[(Dynamic.Mission.TORQUE,
                                               Aircraft.Engine.Motor.TORQUE_MAX)])
 
@@ -47,34 +47,3 @@ class MotorPreMission(om.Group):
                            promotes_inputs=[
                                ('max_torque', Aircraft.Engine.Motor.TORQUE_MAX)],
                            promotes_outputs=[('motor_mass', Aircraft.Engine.Motor.MASS)])
-
-        # TODO Gearbox needs to be its own component separate from motor
-        self.add_subsystem('power_comp',
-                           om.ExecComp('power = torque * pi * RPM / 30',
-                                       power={'val': 0.0, 'units': 'kW'},
-                                       torque={'val': 0.0, 'units': 'kN*m'},
-                                       RPM={'val': 0.0, 'units': 'rpm'}),
-                           promotes_inputs=[('torque', Aircraft.Engine.Motor.TORQUE_MAX),
-                                            ('RPM', Dynamic.Mission.RPM)],
-                           promotes_outputs=[('power', 'shaft_power_max')])
-
-        self.add_subsystem('gearbox_PRM',
-                           om.ExecComp('RPM_out = gear_ratio * RPM_in',
-                                       RPM_out={'val': 0.0, 'units': 'rpm'},
-                                       gear_ratio={'val': 1.0, 'units': None},
-                                       RPM_in={'val': 0.0, 'units': 'rpm'}),
-                           promotes_inputs=['RPM_in',
-                                            ('gear_ratio', Aircraft.Engine.Gearbox.GEAR_RATIO)],
-                           promotes_outputs=['RPM_out'])
-
-        # Gearbox mass from "An N+3 Technolgoy Level Reference Propulsion System" by Scott Jones, William Haller, and Michael Tong
-        # NASA TM 2017-219501
-        self.add_subsystem('gearbox_mass',
-                           om.ExecComp('gearbox_mass = (power / RPM_out)^(0.75) * (RPM_in / RPM_out)^(0.15)',
-                                       gearbox_mass={'val': 0.0, 'units': 'lb'},
-                                       power={'val': 0.0, 'units': 'hp'},
-                                       RPM_out={'val': 0.0, 'units': 'rpm'},
-                                       RPM_in={'val': 0.0, 'units': 'rpm'},),
-                           promotes_inputs=[('power', Dynamic.Mission.SHAFT_POWER_MAX),
-                                            'RPM_out', 'RPM_in'],
-                           promotes_outputs=[('gearbox_mass', Aircraft.Engine.Gearbox.MASS)])

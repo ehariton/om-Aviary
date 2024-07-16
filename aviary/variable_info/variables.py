@@ -259,7 +259,7 @@ class Aircraft:
         class Gearbox:
             GEAR_RATIO = "aircraft:engine:gearbox:gear_ratio"
             MASS = "aircraft:engine:gearbox:mass"
-            TORQUE_MAX = "aircraft:engine:gearbox:torque_max"
+            EFFICIENCY = "aircraft:engine:gearbox:efficiency"
 
         class Motor:
             MASS = 'aircraft:engine:motor:mass'
@@ -638,8 +638,11 @@ class Dynamic:
         # PERCENT_ROTOR_RPM_CORRECTED = 'percent_rotor_rpm_corrected'
         PROPELLER_TIP_SPEED = 'propeller_tip_speed'
         RPM = 'rotations_per_minute'
+        RPM_GEAR = 'rotations_per_minute_gearbox'
         SHAFT_POWER = 'shaft_power'
+        SHAFT_POWER_GEAR = 'shaft_power_gearbox'
         SHAFT_POWER_MAX = 'shaft_power_max'
+        SHAFT_POWER_MAX_GEAR = 'shaft_power_max_gearbox'
         SPECIFIC_ENERGY = 'specific_energy'
         SPECIFIC_ENERGY_RATE = 'specific_energy_rate'
         SPECIFIC_ENERGY_RATE_EXCESS = 'specific_energy_rate_excess'
@@ -653,6 +656,7 @@ class Dynamic:
         THRUST_MAX_TOTAL = 'thrust_net_max_total'
         THRUST_TOTAL = 'thrust_net_total'
         TORQUE = 'torque'
+        TORQUE_GEAR = 'torque_gear'
         VELOCITY = 'velocity'
         VELOCITY_RATE = 'velocity_rate'
 
