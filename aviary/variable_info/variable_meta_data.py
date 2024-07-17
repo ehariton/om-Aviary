@@ -2370,7 +2370,7 @@ add_meta_data(
     meta_data=_MetaData,
     historical_name={"GASP": 'INPROP.GR', "FLOPS": None, "LEAPS1": None},
     units=None,
-    desc='The ratio of the RPM_out divided by the RPM_in for the gearbox.',
+    desc='The ratio of the RPM_in divided by the RPM_out for the gearbox.',
     default_value=1.0,
 )
 
@@ -2396,6 +2396,18 @@ add_meta_data(
     units=None,
     desc='The efficiency of the gearbox.',
     default_value=0.98,
+)
+
+add_meta_data(
+    Aircraft.Engine.Gearbox.SPECIFIC_TORQUE,
+    meta_data=_MetaData,
+    historical_name={"GASP": None,
+                     "FLOPS": None,
+                     "LEAPS1": None
+                     },
+    units='N*m/kg',
+    desc='The specific torque of the gearbox, used to calculate gearbox weight. ',
+    default_value=100,
 )
 
 #  __  __         _

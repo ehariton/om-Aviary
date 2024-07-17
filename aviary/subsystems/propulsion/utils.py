@@ -23,7 +23,7 @@ from aviary.variable_info.variables import Aircraft
 class EngineModelVariables(Enum):
     """
     Define constants that map to supported variable names in an engine model.
-    '''
+    """
 
     MACH = Dynamic.Mission.MACH
     ALTITUDE = Dynamic.Mission.ALTITUDE
@@ -70,13 +70,13 @@ def convert_geopotential_altitude(altitude):
 
     Parameters
     ----------
-    altitude_list: < (float, list of floats) >
-        geopotential altitudes ( in ft) to be converted.
+    altitude_list : <(float, list of floats)>
+        geopotential altitudes (in ft) to be converted.
 
     Returns
     ----------
-    altitude_list: < list of floats >
-    geometric altitudes(ft).
+    altitude_list : <list of floats>
+        geometric altitudes (ft).
     """
     try:
         iter(altitude)
@@ -121,13 +121,13 @@ def build_engine_deck(aviary_options: AviaryValues, meta_data=_MetaData):
 
     Parameter
     ----------
-    aviary_options: AviaryValues
-    Options to use in creation of EngineDecks.
+    aviary_options : AviaryValues
+        Options to use in creation of EngineDecks.
 
     Returns
     ----------
-    engine_models: < list of EngineDecks >
-    List of EngineDecks created using provided aviary_options.
+    engine_models : <list of EngineDecks>
+        List of EngineDecks created using provided aviary_options.
     """
 
     # Required engine vars include one setting from Mission.Summary.

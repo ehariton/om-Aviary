@@ -22,14 +22,14 @@ class GearboxMission(om.Group):
         self.name = 'gearbox_mission'
 
     def setup(self):
-        nn = self.options["num_nodes"]
+        n = self.options["num_nodes"]
 
         self.add_subsystem('RPM_comp',
-                           om.ExecComp('RPM_out = gear_ratio * RPM_in',
-                                       RPM_out={'val': np.ones(nn), 'units': 'rpm'},
-                                       gear_ratio={'val': np.ones(nn), 'units': None},
-                                       RPM_in={'val': np.ones(nn), 'units': 'rpm'}),
-                           promotes_inputs=[('RPM_in', Dynamic.Mission.RPM),  # 'Rotational rate of shaft, per engine.'
+                           om.ExecComp('RPM_out = RPM_in / gear_ratio',
+                                       RPM_out={'val': np.ones(n), 'units': 'rpm'},
+                                       gear_ratio={'val': 1.0, 'units': None},
+                                       RPM_in={'val': np.ones(n), 'units': 'rpm'}),
+                           promotes_inputs=[('RPM_in', Dynamic.Mission.RPM),
                                             ('gear_ratio', Aircraft.Engine.Gearbox.GEAR_RATIO)],
                            promotes_outputs=[('RPM_out', Dynamic.Mission.RPM_GEAR)])
 
@@ -44,12 +44,12 @@ class GearboxMission(om.Group):
                            promotes_outputs=[('shaft_power_out', Dynamic.Mission.SHAFT_POWER_GEAR)])
 
         self.add_subsystem('torque_comp',
-                           om.ExecComp('torque = shaft_power / (pi * RPM_in) * 30',
+                           om.ExecComp('torque = shaft_power / (pi * RPM_out) * 30',
                                        shaft_power={'val': np.ones(n), 'units': 'kW'},
                                        torque={'val': np.ones(n), 'units': 'kN*m'},
-                                       RPM={'val': np.ones(n), 'units': 'rpm'}),
+                                       RPM_out={'val': np.ones(n), 'units': 'rpm'}),
                            promotes_inputs=[('shaft_power', Dynamic.Mission.SHAFT_POWER_GEAR),
-                                            ('RPM_in', Dynamic.Mission.RPM)],
+                                            ('RPM_out', Dynamic.Mission.RPM_GEAR)],
                            promotes_outputs=[('torque', Dynamic.Mission.TORQUE_GEAR)])
 
         # Determine the maximum power available at this flight condition
@@ -62,6 +62,6 @@ class GearboxMission(om.Group):
                                        eff={'val': 0.98, 'units': None}),
                            promotes_inputs=[('shaft_power_in', Dynamic.Mission.SHAFT_POWER_MAX),
                                             ('eff', Aircraft.Engine.Gearbox.EFFICIENCY)],
-                           promotes_outputs=[('shaft_power_out', Dynamic.Mission.SHAFT_POWER_GEAR_MAX)])
+                           promotes_outputs=[('shaft_power_out', Dynamic.Mission.SHAFT_POWER_MAX_GEAR)])
 
         # TODO max thrust from the props will depend on this max shaft power from the gearbox and the new gearbox RPM value

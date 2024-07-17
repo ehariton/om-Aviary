@@ -15,7 +15,7 @@ class TestGearboxDerivs(unittest.TestCase):
 
         self.options = av.AviaryValues()
 
-        self.battery = GearboxBuilder()
+        self.gearbox = GearboxBuilder()
 
     def test_gearbox_premission(self):
         prob = self.prob
@@ -25,55 +25,72 @@ class TestGearboxDerivs(unittest.TestCase):
 
         prob.setup(force_alloc_complex=True)
 
-        prob.set_val(av.Aircraft.Battery.PACK_ENERGY_DENSITY, 550, units='kW*h/kg')
-        prob.set_val(av.Aircraft.Battery.PACK_MASS, 1200, units='lbm')
-        prob.set_val(av.Aircraft.Battery.ADDITIONAL_MASS, 115, units='lbm')
+        prob.set_val(av.Dynamic.Mission.RPM, 6195, units='rpm')
+        prob.set_val(av.Dynamic.Mission.SHAFT_POWER_MAX, 375, units='hp')
+        prob.set_val(av.Aircraft.Engine.Gearbox.GEAR_RATIO, 12.6, units=None)
+        prob.set_val(av.Aircraft.Engine.Gearbox.SPECIFIC_TORQUE, 103, units='N*m/kg')
 
         prob.run_model()
 
-        mass_expected = 1_315
-        energy_expected = 1_077_735.47112
+        mass = prob.get_val(av.Aircraft.Engine.Gearbox.MASS, 'lb')
+        torque_max = prob.get_val('torque_max', 'lbf*ft')
 
-        mass = prob.get_val(av.Aircraft.Battery.MASS, 'lbm')
-        energy = prob.get_val(av.Aircraft.Battery.ENERGY_CAPACITY, 'MJ')
-
-        assert_near_equal(mass, mass_expected, tolerance=1e-10)
-        assert_near_equal(energy, energy_expected, tolerance=1e-10)
+        torque_max_expected = 4005.84967696
+        mass_expected = 116.25002688
+        assert_near_equal(mass, mass_expected, tolerance=1e-6)
+        assert_near_equal(torque_max, torque_max_expected, tolerance=1e-6)
 
         partial_data = prob.check_partials(out_stream=None, method="cs")
         assert_check_partials(partial_data, atol=1e-9, rtol=1e-9)
 
-    def test_battery_mission(self):
+    def test_gearbox_mission(self):
         prob = self.prob
-        prob.model.add_subsystem('battery_mission',
-                                 subsys=self.battery.build_mission(num_nodes=4),
+        num_nodes = 3
+        prob.model.add_subsystem('gearbox_mission',
+                                 self.gearbox.build_mission(
+                                     num_nodes=num_nodes, aviary_inputs=self.options),
                                  promotes=['*'])
-
-        efficiency = 0.95
-        prob.model.set_input_defaults(
-            av.Aircraft.Battery.ENERGY_CAPACITY, 10_000, units='kJ')
-        prob.model.set_input_defaults(
-            av.Aircraft.Battery.EFFICIENCY, efficiency, units='unitless')
-        prob.model.set_input_defaults(av.Dynamic.Mission.CUMULATIVE_ELECTRIC_ENERGY_USED, [
-                                      0, 2_000, 5_000, 9_500], units='kJ')
 
         prob.setup(force_alloc_complex=True)
 
+        prob.set_val(av.Dynamic.Mission.RPM, [5000, 6195, 6195], units='rpm')
+        prob.set_val(av.Dynamic.Mission.SHAFT_POWER, [100, 200, 375], units='hp')
+        prob.set_val(av.Dynamic.Mission.SHAFT_POWER_MAX, [375, 300, 375], units='hp')
+        prob.set_val(av.Aircraft.Engine.Gearbox.GEAR_RATIO, 12.6, units=None)
+        prob.set_val(av.Aircraft.Engine.Gearbox.EFFICIENCY, 0.98, units=None)
+
         prob.run_model()
 
-        soc_expected = np.array([1., 0.7894736842105263, 0.4736842105263159, 0.])
-        soc = prob.get_val(av.Dynamic.Mission.BATTERY_STATE_OF_CHARGE, 'unitless')
+        SHAFT_POWER_GEAR = prob.get_val(av.Dynamic.Mission.SHAFT_POWER_GEAR, 'hp')
+        RPM_GEAR = prob.get_val(av.Dynamic.Mission.RPM_GEAR, 'rpm')
+        TORQUE_GEAR = prob.get_val(av.Dynamic.Mission.TORQUE_GEAR, 'ft*lbf')
+        SHAFT_POWER_MAX_GEAR = prob.get_val(
+            av.Dynamic.Mission.SHAFT_POWER_MAX_GEAR, 'hp')
 
-        assert_near_equal(soc, soc_expected, tolerance=1e-10)
+        SHAFT_POWER_GEAR_expected = [98.,  196.,  367.5]
+        RPM_GEAR_expected = [396.82539683, 491.66666667, 491.66666667]
+        TORQUE_GEAR_expected = [1297.0620786,  2093.72409783, 3925.73268342]
+        SHAFT_POWER_MAX_GEAR_expected = [367.5, 294.,  367.5]
+
+        # print('SHAFT_POWER_GEAR (hp)', SHAFT_POWER_GEAR)
+        # print('SHAFT_POWER_MAX_GEAR (hp)', SHAFT_POWER_MAX_GEAR)
+        # print('RPM_GEAR (RPM)', RPM_GEAR)
+        # print('TORQUE_GEAR (ft*lbf)', TORQUE_GEAR)
+
+        assert_near_equal(SHAFT_POWER_GEAR, SHAFT_POWER_GEAR_expected, tolerance=1e-6)
+        assert_near_equal(RPM_GEAR, RPM_GEAR_expected, tolerance=1e-6)
+        assert_near_equal(TORQUE_GEAR, TORQUE_GEAR_expected, tolerance=1e-6)
+        assert_near_equal(SHAFT_POWER_MAX_GEAR,
+                          SHAFT_POWER_MAX_GEAR_expected, tolerance=1e-6)
 
         partial_data = prob.check_partials(out_stream=None, method="cs")
         assert_check_partials(partial_data, atol=1e-9, rtol=1e-9)
 
 
-class TestBattery(av.TestSubsystemBuilderBase):
+class TestGearbox(av.TestSubsystemBuilderBase):
 
     def setUp(self):
-        self.subsystem_builder = BatteryBuilder()
+        self.subsystem_builder = GearboxBuilder()
         self.aviary_values = av.AviaryValues()
 
 

@@ -260,6 +260,7 @@ class Aircraft:
             GEAR_RATIO = "aircraft:engine:gearbox:gear_ratio"
             MASS = "aircraft:engine:gearbox:mass"
             EFFICIENCY = "aircraft:engine:gearbox:efficiency"
+            SPECIFIC_TORQUE = "aircraft:engine:gearbox:specific_torque"
 
         class Motor:
             MASS = 'aircraft:engine:motor:mass'
