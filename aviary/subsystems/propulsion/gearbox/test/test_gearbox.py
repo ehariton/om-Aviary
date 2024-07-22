@@ -72,11 +72,6 @@ class TestGearboxDerivs(unittest.TestCase):
         TORQUE_GEAR_expected = [1297.0620786,  2093.72409783, 3925.73268342]
         SHAFT_POWER_MAX_GEAR_expected = [367.5, 294.,  367.5]
 
-        # print('SHAFT_POWER_GEAR (hp)', SHAFT_POWER_GEAR)
-        # print('SHAFT_POWER_MAX_GEAR (hp)', SHAFT_POWER_MAX_GEAR)
-        # print('RPM_GEAR (RPM)', RPM_GEAR)
-        # print('TORQUE_GEAR (ft*lbf)', TORQUE_GEAR)
-
         assert_near_equal(SHAFT_POWER_GEAR, SHAFT_POWER_GEAR_expected, tolerance=1e-6)
         assert_near_equal(RPM_GEAR, RPM_GEAR_expected, tolerance=1e-6)
         assert_near_equal(TORQUE_GEAR, TORQUE_GEAR_expected, tolerance=1e-6)

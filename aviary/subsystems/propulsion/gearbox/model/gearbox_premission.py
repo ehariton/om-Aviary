@@ -49,7 +49,7 @@ class GearboxPreMission(om.Group):
                                             ('specific_torque', Aircraft.Engine.Gearbox.SPECIFIC_TORQUE)],
                            promotes_outputs=[('gearbox_mass', Aircraft.Engine.Gearbox.MASS)])
 
-        # This gearbox can work for large systems but can produce negative weights for small shaftpower system
+        # This gearbox can work for large systems but can produce negative weights for some inputs
         # # Gearbox mass from "An N+3 Technolgoy Level Reference Propulsion System" by Scott Jones, William Haller, and Michael Tong
         # # NASA TM 2017-219501
 

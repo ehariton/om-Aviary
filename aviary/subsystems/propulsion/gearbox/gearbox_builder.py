@@ -28,25 +28,36 @@ class GearboxBuilder(SubsystemBuilderBase):
 
     def get_design_vars(self):
         '''
-        Design vars are only tested to see if they exist in gearbox_pre_mission
+        Design vars are only tested to see if they exist in pre_mission
         Returns a dictionary of design variables for the gearbox subsystem, where the keys are the 
         names of the design variables, and the values are dictionaries that contain the units for 
         the design variable, the lower and upper bounds for the design variable, and any 
         additional keyword arguments required by OpenMDAO for the design variable.
-        '''
+
+                        '''
 
         DVs = {
             Aircraft.Engine.Gearbox.GEAR_RATIO: {
+                'opt': True,
                 'units': None,
                 'lower': 1.0,
                 'upper': 20.0,
+                'val':  10  # initial value
+            },
+            Aircraft.Engine.Gearbox.SPECIFIC_TORQUE: {
+                'lower': 100,
+                'upper': 100,
+                'opt': False,
+                'val': 100,
+                'units': 'N*m/kg',
             }
         }
         return DVs
 
-    def get_parameters(self):
+    def get_parameters(self, aviary_inputs=None, phase_info=None):
         '''
-        Parameters are only tested to see if they exist in gearbox_mission.
+        Parameters are only tested to see if they exist in mission.
+        A value the doesn't change throught the mission mission
         Returns a dictionary of fixed values for the gearbox subsystem, where the keys are the names 
         of the fixed values, and the values are dictionaries that contain the fixed value for the 
         variable, the units for the variable, and any additional keyword arguments required by 
@@ -62,10 +73,6 @@ class GearboxBuilder(SubsystemBuilderBase):
                 'val': 0.98,
                 'units': None,
             },
-            Aircraft.Engine.Gearbox.SPECIFIC_TORQUE: {
-                'val': 100,
-                'units': 'N*m/kg'
-            }
         }
 
         return parameters

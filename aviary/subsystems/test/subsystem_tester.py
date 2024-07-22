@@ -146,7 +146,10 @@ class TestSubsystemBuilderBase(unittest.TestCase):
             self.aviary_values = AviaryValues()
 
         # Verify that the method returns a dictionary
-        parameters = self.subsystem_builder.get_parameters()
+        parameters = self.subsystem_builder.get_parameters(
+            aviary_inputs=self.aviary_values,
+            phase_info={}
+        )
         self.assertIsInstance(
             parameters, dict, "get_parameters() should return a dictionary")
 
@@ -288,7 +291,10 @@ class TestSubsystemBuilderBase(unittest.TestCase):
         if not hasattr(self, 'aviary_values'):
             self.aviary_values = AviaryValues()
 
-        parameters = self.subsystem_builder.get_parameters()
+        parameters = self.subsystem_builder.get_parameters(
+            aviary_inputs=self.aviary_values,
+            phase_info={}
+        )
 
         mission_sys = self.subsystem_builder.build_mission(
             num_nodes=5, aviary_inputs=self.aviary_values)
