@@ -24,13 +24,15 @@ import sys
 from aviary.subsystems.mass.flops_based.furnishings import TransportFurnishingsGroupMass
 from aviary.api import SubsystemBuilderBase
 from aviary.validation_cases.validation_tests import get_flops_inputs
+from aviary.utils.functions import get_path
 
 ######################################################################
 # OUTPUTS FROM UQPCE / PROBLEM UNCERTAINTY DEFINITION SHOULD GO HERE
 
 # These varying values will be created by UQPCE
 TOTAL_PAYLOAD_MASS_LBM = [20348, 40348]
-
+DECK_filename = [get_path('models/engines/turbofan_22k.deck'),
+                 get_path('models/engines/turbofan_22k.deck')]
 
 # END OF QUPCE / UNCERTAINTY OUTPUTS
 ######################################################################
@@ -45,7 +47,7 @@ TOTAL_PAYLOAD_MASS_LBM = [20348, 40348]
 Design_GROSS_MASS_LBM = 120734
 
 
-def Create_phase_and_values(Design_GROSS_MASS_LBM, TOTAL_PAYLOAD_MASS_LBM):
+def Create_phase_and_values(Design_GROSS_MASS_LBM, TOTAL_PAYLOAD_MASS_LBM, DECK_filename):
     aviary_values = []
     phase_infos = []
     N3CC_basic = get_flops_inputs('N3CC')
@@ -60,6 +62,7 @@ def Create_phase_and_values(Design_GROSS_MASS_LBM, TOTAL_PAYLOAD_MASS_LBM):
                                   Design_GROSS_MASS_LBM, 'lbm')
         aviary_inputs_tmp.set_val(
             Aircraft.CrewPayload.TOTAL_PAYLOAD_MASS, TOTAL_PAYLOAD_MASS_LBM[i], 'lbm')
+        aviary_inputs_tmp.set_val(Aircraft.Engine.DATA_FILE, DECK_filename[i])
         aviary_values.append(aviary_inputs_tmp)
     return phase_infos, aviary_values
 
@@ -286,8 +289,12 @@ class MultiMissionProblem(om.Problem):
 
 
 def N3CC_example(makeN2=False):
-    phase_infos, aviary_values = Create_phase_and_values(
-        Design_GROSS_MASS_LBM, TOTAL_PAYLOAD_MASS_LBM)
+    phase_infos, aviary_values = \
+        Create_phase_and_values(
+            Design_GROSS_MASS_LBM,
+            TOTAL_PAYLOAD_MASS_LBM,
+            DECK_filename)
+
     optalt, optmach = False, False
     for phaseinfo in phase_infos:
         for key in phaseinfo.keys():
