@@ -36,9 +36,10 @@ prob.add_design_variables()
 # Detail which variables the optimizer can control
 prob.add_objective()
 
-traj = prob.model._get_subsystem('traj')
-descent = traj.phases._get_subsystem('descent')
-descent.add_boundary_constraint('time', loc='final', upper=480, units='min')
+# Add Time Constraint
+# traj = prob.model._get_subsystem('traj')
+# descent = traj.phases._get_subsystem('descent')
+# descent.add_boundary_constraint('time', loc='final', upper=480, units='min')
 
 prob.setup()
 

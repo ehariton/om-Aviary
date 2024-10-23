@@ -34,7 +34,14 @@ prob_tmp = av.AviaryProblem()
 aviary_inputs_primary = prob_tmp.load_inputs(
     get_flops_inputs('N3CC'), phase_info_primary)
 aviary_inputs_primary.set_val(Aircraft.CrewPayload.TOTAL_PAYLOAD_MASS, 20348, 'lbm')
-aviary_inputs_primary.set_val(Mission.Design.GROSS_MASS, 150734., 'lbm')
+
+# Always choose a gross mass guess that is LOWER than the final expected GROSS_MASS
+# Explanation: GROSS_MASS_constraint exists in methods_for_level2.py. This constraint
+# forces the Design.GROSS_MASS to be larger or equal to the largest Summary.GROSS_MASS.
+# This constraint only becomes active when the initial guess on Design.GROSS_MASS is
+# small. When guessing a Design.GROSS_MASS that is larger, SLSQP does not always work
+# hard enough to minimize that value and it's feasible so it stops the opt before it should.
+aviary_inputs_primary.set_val(Mission.Design.GROSS_MASS, 120734., 'lbm')
 
 aviary_inputs_heavy = copy.deepcopy(aviary_inputs_primary)
 aviary_inputs_heavy.set_val(Aircraft.CrewPayload.TOTAL_PAYLOAD_MASS, 40348, 'lbm')
@@ -76,6 +83,12 @@ class MultiMissionProblem(om.Problem):
             # alternate prevents use of equality constraint b/w design and summary gross mass
             prob.problem_type = ProblemType.MULTI_MISSION
             prob.add_design_variables()
+
+            # Add Time Constraint
+            # traj = prob.model._get_subsystem('traj')
+            # descent = traj.phases._get_subsystem('descent')
+            # descent.add_boundary_constraint('time', loc='final', upper=480, units='min')
+
             self.probs.append(prob)
             # phase names for each traj (can be used later to make plots/print outputs)
             self.phases[f"{self.group_prefix}_{i}"] = list(prob.traj._phases.keys())
@@ -107,6 +120,13 @@ class MultiMissionProblem(om.Problem):
         self.driver.declare_coloring()
         # linear solver causes nan entry error for landing to takeoff mass ratio param
         # self.model.linear_solver = om.DirectSolver()
+
+    # def add_mux(self, vec_size):
+    #     # Add a mux to turn the fuel_burn into a vector
+    #     fuel_mux = self.model.add_subsystem(
+    #         name='fuel_mux', subsys=om.MuxComp(vec_size=vec_size))
+
+    #     fuel_mux.add_var(f'{fuelobj}', shape=(m,), axis=1, units='m')
 
     def add_objective(self):
         # weights are normalized - e.g. for given weights 3:1, the normalized
@@ -248,6 +268,7 @@ def large_single_aisle_example(makeN2=False):
     super_prob.add_driver()
     super_prob.add_design_variables()
     super_prob.add_objective()
+
     # set input default to prevent error, value doesn't matter since set val is used later
     super_prob.model.set_input_defaults(Mission.Design.RANGE, val=1.)
     super_prob.setup_wrapper()
