@@ -103,16 +103,17 @@ class MultiMissionProblem(om.Problem):
                 self.group_prefix + f'_{i}', prob.model,
                 promotes_inputs=[Mission.Design.GROSS_MASS,
                                  Mission.Design.RANGE,
-                                 Aircraft.Wing.SPAN,
-                                 Aircraft.Wing.AREA],
+                                 #  Aircraft.Wing.SPAN,
+                                 #  Aircraft.Wing.AREA
+                                 ],
                 promotes_outputs=[(Mission.Objectives.FUEL, promoted_name)])
 
     def add_design_variables(self):
         self.model.add_design_var(Mission.Design.GROSS_MASS,
                                   lower=10., upper=900e3, units='lbm')
-        self.model.add_design_var(Aircraft.Wing.SPAN, lower=100., upper=500., units='ft')
-        self.model.add_design_var(Aircraft.Wing.AREA, lower=10.,
-                                  upper=1e6, units='ft**2')
+        # self.model.add_design_var(Aircraft.Wing.SPAN, lower=100., upper=500., units='ft')
+        # self.model.add_design_var(Aircraft.Wing.AREA, lower=10.,
+        #                           upper=1e6, units='ft**2')
 
     def add_driver(self):
         self.driver = om.pyOptSparseDriver()
@@ -121,12 +122,14 @@ class MultiMissionProblem(om.Problem):
         # linear solver causes nan entry error for landing to takeoff mass ratio param
         # self.model.linear_solver = om.DirectSolver()
 
-    # def add_mux(self, vec_size):
+    # def add_mux(self, fuel_vars):
     #     # Add a mux to turn the fuel_burn into a vector
-    #     fuel_mux = self.model.add_subsystem(
-    #         name='fuel_mux', subsys=om.MuxComp(vec_size=vec_size))
 
-    #     fuel_mux.add_var(f'{fuelobj}', shape=(m,), axis=1, units='m')
+    #     fuel_mux = self.model.add_subsystem(
+    #         name='fuel_mux', subsys=om.MuxComp(vec_size=len(fuel_vars)))
+
+    #     for name in fuel_vars:
+    #         fuel_mux.add_var(name, shape=(1,), axis=1, units='kg')
 
     def add_objective(self):
         # weights are normalized - e.g. for given weights 3:1, the normalized
