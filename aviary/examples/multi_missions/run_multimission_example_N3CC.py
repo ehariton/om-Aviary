@@ -122,14 +122,14 @@ class MultiMissionProblem(om.Problem):
         # linear solver causes nan entry error for landing to takeoff mass ratio param
         # self.model.linear_solver = om.DirectSolver()
 
-    # def add_mux(self, fuel_vars):
-    #     # Add a mux to turn the fuel_burn into a vector
+    def add_mux(self):
+        # Add a mux to turn the fuel_burn into a vector
 
-    #     fuel_mux = self.model.add_subsystem(
-    #         name='fuel_mux', subsys=om.MuxComp(vec_size=len(fuel_vars)))
+        fuel_mux = self.model.add_subsystem(
+            name='fuel_mux', subsys=om.MuxComp(vec_size=len(self.fuel_vars)))
 
-    #     for name in fuel_vars:
-    #         fuel_mux.add_var(name, shape=(1,), axis=1, units='kg')
+        for name in self.fuel_vars:
+            fuel_mux.add_var(name, shape=(1,), axis=1, units='kg')
 
     def add_objective(self):
         # weights are normalized - e.g. for given weights 3:1, the normalized
@@ -143,7 +143,10 @@ class MultiMissionProblem(om.Problem):
 
         # adding compound execComp to super problem
         self.model.add_subsystem('compound_fuel_burn_objective', om.ExecComp(
-            "compound = "+weighted_str, has_diag_partials=True), promotes=["compound"])
+            "compound = "+weighted_str, has_diag_partials=True),
+            promotes_inputs=self.fuel_vars,
+            promotes_outputs=["compound"])
+
         self.model.add_objective('compound')
 
     def setup_wrapper(self):
@@ -270,6 +273,7 @@ def large_single_aisle_example(makeN2=False):
     super_prob = MultiMissionProblem(aviary_values, phase_infos, weights)
     super_prob.add_driver()
     super_prob.add_design_variables()
+    super_prob.add_mux()
     super_prob.add_objective()
 
     # set input default to prevent error, value doesn't matter since set val is used later
