@@ -126,10 +126,18 @@ class MultiMissionProblem(om.Problem):
         # Add a mux to turn the fuel_burn into a vector
 
         fuel_mux = self.model.add_subsystem(
-            name='fuel_mux', subsys=om.MuxComp(vec_size=len(self.fuel_vars)))
+            'fuel_mux',
+            om.MuxComp(vec_size=len(self.fuel_vars)),
+            # note we declare the output before 'fuel_obj_vec' is added
+            promotes_outputs=['fuel_obj_vec'])
 
+        fuel_mux.add_var('fuel_obj_vec', units='unitless')
+
+        x = 0
         for name in self.fuel_vars:
-            fuel_mux.add_var(name, shape=(1,), axis=1, units='kg')
+            print(name)
+            self.model.connect(name, f"fuel_mux.fuel_obj_vec_{x}")
+            x += 1
 
     def add_objective(self):
         # weights are normalized - e.g. for given weights 3:1, the normalized
@@ -268,12 +276,16 @@ def large_single_aisle_example(makeN2=False):
                 phaseinfo[key]["user_options"]["optimize_altitude"] = optalt
 
     # how much each mission should be valued by the optimizer, larger numbers = more significance
-    weights = [9, 1]
+    weights = [1, 1]
 
     super_prob = MultiMissionProblem(aviary_values, phase_infos, weights)
     super_prob.add_driver()
     super_prob.add_design_variables()
     super_prob.add_mux()
+
+    # TBD: FOR UQPCE, change the objective and promotes_inputs('fuel_obj_vec') which
+    # has just been created by the add_mux() call
+
     super_prob.add_objective()
 
     # set input default to prevent error, value doesn't matter since set val is used later
