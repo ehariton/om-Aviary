@@ -25,15 +25,16 @@ from aviary.subsystems.mass.flops_based.furnishings import TransportFurnishingsG
 from aviary.api import SubsystemBuilderBase
 from aviary.validation_cases.validation_tests import get_flops_inputs
 
-# fly the same mission twice with two different passenger loads
-phase_info_primary = copy.deepcopy(phase_info)
-phase_info_heavy = copy.deepcopy(phase_info)
+######################################################################
+# OUTPUTS FROM UQPCE / PROBLEM UNCERTAINTY DEFINITION SHOULD GO HERE
 
-# instantiating a problem just so we can get the right aviary_inputs
-prob_tmp = av.AviaryProblem()
-aviary_inputs_primary = prob_tmp.load_inputs(
-    get_flops_inputs('N3CC'), phase_info_primary)
-aviary_inputs_primary.set_val(Aircraft.CrewPayload.TOTAL_PAYLOAD_MASS, 20348, 'lbm')
+# These varying values will be created by UQPCE
+TOTAL_PAYLOAD_MASS_LBM = [20348, 40348]
+
+
+# END OF QUPCE / UNCERTAINTY OUTPUTS
+######################################################################
+
 
 # Always choose a gross mass guess that is LOWER than the final expected GROSS_MASS
 # Explanation: GROSS_MASS_constraint exists in methods_for_level2.py. This constraint
@@ -41,10 +42,26 @@ aviary_inputs_primary.set_val(Aircraft.CrewPayload.TOTAL_PAYLOAD_MASS, 20348, 'l
 # This constraint only becomes active when the initial guess on Design.GROSS_MASS is
 # small. When guessing a Design.GROSS_MASS that is larger, SLSQP does not always work
 # hard enough to minimize that value and it's feasible so it stops the opt before it should.
-aviary_inputs_primary.set_val(Mission.Design.GROSS_MASS, 120734., 'lbm')
+Design_GROSS_MASS_LBM = 120734
 
-aviary_inputs_heavy = copy.deepcopy(aviary_inputs_primary)
-aviary_inputs_heavy.set_val(Aircraft.CrewPayload.TOTAL_PAYLOAD_MASS, 40348, 'lbm')
+
+def Create_phase_and_values(Design_GROSS_MASS_LBM, TOTAL_PAYLOAD_MASS_LBM):
+    aviary_values = []
+    phase_infos = []
+    N3CC_basic = get_flops_inputs('N3CC')
+
+    for i in range(len(TOTAL_PAYLOAD_MASS_LBM)):
+        phase_info_tmp = copy.deepcopy(phase_info)
+        # modifications ot phase info can go here
+        phase_infos.append(phase_info_tmp)
+        aviary_inputs_tmp = copy.deepcopy(N3CC_basic)
+        # modifications to aviary inputs can go here
+        aviary_inputs_tmp.set_val(Mission.Design.GROSS_MASS,
+                                  Design_GROSS_MASS_LBM, 'lbm')
+        aviary_inputs_tmp.set_val(
+            Aircraft.CrewPayload.TOTAL_PAYLOAD_MASS, TOTAL_PAYLOAD_MASS_LBM[i], 'lbm')
+        aviary_values.append(aviary_inputs_tmp)
+    return phase_infos, aviary_values
 
 
 class MultiMissionProblem(om.Problem):
@@ -57,9 +74,14 @@ class MultiMissionProblem(om.Problem):
         if self.num_missions != len(phase_infos):
             raise Exception("Length of aviary_values and phase_infos must be the same!")
 
-        # if fewer weights than aviary_values are provided, assign equal weights for all aviary_values
+        # if fewer weights than aviary_values are provided, raise error
         if len(weights) < self.num_missions:
-            weights = [1]*self.num_missions
+            print(len(weights))
+            if len(weights) <= 1:
+                weights = [1]*self.num_missions
+            else:
+                raise Exception(
+                    "Length of weights is smaller than length of aviary_values but also has multiple entries. Please set weights to a single value, or the same number of values as aviary_valuse.")
         # if more weights than aviary_values, raise exception
         elif len(weights) > self.num_missions:
             raise Exception("Length of weights cannot exceed length of aviary_values!")
@@ -263,11 +285,9 @@ class MultiMissionProblem(om.Problem):
             print()
 
 
-def large_single_aisle_example(makeN2=False):
-    aviary_values = [aviary_inputs_primary,
-                     aviary_inputs_heavy]
-    phase_infos = [phase_info_primary,
-                   phase_info_heavy]
+def N3CC_example(makeN2=False):
+    phase_infos, aviary_values = Create_phase_and_values(
+        Design_GROSS_MASS_LBM, TOTAL_PAYLOAD_MASS_LBM)
     optalt, optmach = False, False
     for phaseinfo in phase_infos:
         for key in phaseinfo.keys():
@@ -276,7 +296,7 @@ def large_single_aisle_example(makeN2=False):
                 phaseinfo[key]["user_options"]["optimize_altitude"] = optalt
 
     # how much each mission should be valued by the optimizer, larger numbers = more significance
-    weights = [1, 1]
+    weights = [1]
 
     super_prob = MultiMissionProblem(aviary_values, phase_infos, weights)
     super_prob.add_driver()
@@ -343,7 +363,7 @@ def large_single_aisle_example(makeN2=False):
 if __name__ == '__main__':
     makeN2 = True if (len(sys.argv) > 1 and "n2" in sys.argv[1]) else False
 
-    super_prob = large_single_aisle_example(makeN2=makeN2)
+    super_prob = N3CC_example(makeN2=makeN2)
 
     # Uncomment the following lines to see mass breakdown details for each mission.
     # super_prob.model.group_1.list_vars(val=True, units=True, print_arrays=False)
