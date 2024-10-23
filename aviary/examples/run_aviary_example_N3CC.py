@@ -13,7 +13,7 @@ prob = av.AviaryProblem()
 
 aviary_inputs = prob.load_inputs(get_flops_inputs('N3CC'), phase_info)
 
-aviary_inputs.set_val(Aircraft.CrewPayload.TOTAL_PAYLOAD_MASS, 31348, 'lbm')
+aviary_inputs.set_val(Aircraft.CrewPayload.TOTAL_PAYLOAD_MASS, 41348, 'lbm')
 aviary_inputs.set_val(Settings.VERBOSITY, av.Verbosity.BRIEF)
 
 # Preprocess inputs
