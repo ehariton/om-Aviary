@@ -30,12 +30,20 @@ from aviary.utils.functions import get_path
 # OUTPUTS FROM UQPCE / PROBLEM UNCERTAINTY DEFINITION SHOULD GO HERE
 
 # These varying values will be created by UQPCE
+
 TOTAL_PAYLOAD_MASS_LBM = [20348, 40348]
 DECK_filename = [get_path('models/engines/turbofan_22k.deck'),
                  get_path('models/engines/turbofan_22k.deck')]
+TIME_CONSTRAINT_MIN = [0, 0]  # set to zeros if you don't want to use it
 
 # END OF QUPCE / UNCERTAINTY OUTPUTS
 ######################################################################
+
+# Check to make sure all the input vectors are the same length
+if len(TOTAL_PAYLOAD_MASS_LBM) != len(DECK_filename) or \
+        len(TOTAL_PAYLOAD_MASS_LBM) != len(TIME_CONSTRAINT_MIN):
+    print('Error: TOTAL_PAYLOAD_MASS_LBM, DECK_filename, and TIME_CONSTRAINT_MIN must be vectors of the same length.')
+    exit()
 
 
 # Always choose a gross mass guess that is LOWER than the final expected GROSS_MASS
@@ -68,7 +76,7 @@ def Create_phase_and_values(Design_GROSS_MASS_LBM, TOTAL_PAYLOAD_MASS_LBM, DECK_
 
 
 class MultiMissionProblem(om.Problem):
-    def __init__(self, aviary_values, phase_infos, weights):
+    def __init__(self, aviary_values, phase_infos, weights, TIME_CONSTRAINT_MIN):
         super().__init__()
         self.num_missions = len(aviary_values)
         # phase infos and aviary_values length must match - this maybe unnecessary if
@@ -105,14 +113,25 @@ class MultiMissionProblem(om.Problem):
             prob.add_post_mission_systems()
             prob.link_phases()
 
+            # Add Time Constraint
+            if TIME_CONSTRAINT_MIN[i] > 0:
+                traj = prob.model._get_subsystem('traj')
+                try:
+                    descent = traj.phases._get_subsystem('descent')
+                    time_constraint = True
+                except:
+                    print('Warning: No Descent Phase, skipping adding time boundary constraint.')
+                    time_constraint = False
+                if time_constraint is True:
+                    print('Adding time constraint to group_', i)
+                    descent.add_boundary_constraint(
+                        'time', loc='final', upper=TIME_CONSTRAINT_MIN[i], units='min')
+            else:
+                print('TIME_CONSTRAINT <= 0. Not adding time constraint to group_', i)
+
             # alternate prevents use of equality constraint b/w design and summary gross mass
             prob.problem_type = ProblemType.MULTI_MISSION
             prob.add_design_variables()
-
-            # Add Time Constraint
-            # traj = prob.model._get_subsystem('traj')
-            # descent = traj.phases._get_subsystem('descent')
-            # descent.add_boundary_constraint('time', loc='final', upper=480, units='min')
 
             self.probs.append(prob)
             # phase names for each traj (can be used later to make plots/print outputs)
@@ -160,7 +179,6 @@ class MultiMissionProblem(om.Problem):
 
         x = 0
         for name in self.fuel_vars:
-            print(name)
             self.model.connect(name, f"fuel_mux.fuel_obj_vec_{x}")
             x += 1
 
@@ -305,7 +323,8 @@ def N3CC_example(makeN2=False):
     # how much each mission should be valued by the optimizer, larger numbers = more significance
     weights = [1]
 
-    super_prob = MultiMissionProblem(aviary_values, phase_infos, weights)
+    super_prob = MultiMissionProblem(
+        aviary_values, phase_infos, weights, TIME_CONSTRAINT_MIN)
     super_prob.add_driver()
     super_prob.add_design_variables()
     super_prob.add_mux()
