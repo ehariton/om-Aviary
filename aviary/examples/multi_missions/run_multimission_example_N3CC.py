@@ -39,6 +39,11 @@ TIME_CONSTRAINT_MIN = [0, 0]  # set to zeros if you don't want to use it
 # END OF QUPCE / UNCERTAINTY OUTPUTS
 ######################################################################
 
+# One place to make changes to all mach and alt optimization options
+opt_mach = False
+opt_alt = False
+
+
 # Check to make sure all the input vectors are the same length
 if len(TOTAL_PAYLOAD_MASS_LBM) != len(DECK_filename) or \
         len(TOTAL_PAYLOAD_MASS_LBM) != len(TIME_CONSTRAINT_MIN):
@@ -55,13 +60,18 @@ if len(TOTAL_PAYLOAD_MASS_LBM) != len(DECK_filename) or \
 Design_GROSS_MASS_LBM = 120734
 
 
-def Create_phase_and_values(Design_GROSS_MASS_LBM, TOTAL_PAYLOAD_MASS_LBM, DECK_filename):
+def Create_phase_and_values(Design_GROSS_MASS_LBM, TOTAL_PAYLOAD_MASS_LBM, DECK_filename, opt_mach, opt_alt):
+
     aviary_values = []
     phase_infos = []
     N3CC_basic = get_flops_inputs('N3CC')
 
     for i in range(len(TOTAL_PAYLOAD_MASS_LBM)):
         phase_info_tmp = copy.deepcopy(phase_info)
+        for key in phase_info_tmp.keys():
+            if "user_options" in phase_info_tmp[key].keys():
+                phase_info_tmp[key]["user_options"]["optimize_mach"] = opt_mach
+                phase_info_tmp[key]["user_options"]["optimize_altitude"] = opt_alt
         # modifications ot phase info can go here
         phase_infos.append(phase_info_tmp)
         aviary_inputs_tmp = copy.deepcopy(N3CC_basic)
@@ -311,14 +321,9 @@ def N3CC_example(makeN2=False):
         Create_phase_and_values(
             Design_GROSS_MASS_LBM,
             TOTAL_PAYLOAD_MASS_LBM,
-            DECK_filename)
-
-    optalt, optmach = False, False
-    for phaseinfo in phase_infos:
-        for key in phaseinfo.keys():
-            if "user_options" in phaseinfo[key].keys():
-                phaseinfo[key]["user_options"]["optimize_mach"] = optmach
-                phaseinfo[key]["user_options"]["optimize_altitude"] = optalt
+            DECK_filename,
+            opt_mach,
+            opt_alt)
 
     # how much each mission should be valued by the optimizer, larger numbers = more significance
     weights = [1]
