@@ -10,7 +10,7 @@ optimizer sees.
 
 """
 import copy as copy
-from aviary.examples.example_phase_info_N3CC import phase_info
+from aviary.examples.example_phase_info_N3CC_quick import phase_info
 from aviary.variable_info.variables import Mission, Aircraft
 from aviary.variable_info.enums import ProblemType
 import aviary.api as av
@@ -31,9 +31,9 @@ from aviary.utils.functions import get_path
 
 # These varying values will be created by UQPCE
 
-TOTAL_PAYLOAD_MASS_LBM = [20348, 40348]
-DECK_filename = [get_path('models/engines/turbofan_22k.deck'),
-                 get_path('models/engines/turbofan_22k.deck')]
+TOTAL_PAYLOAD_MASS_LBM = [30000, 40000]
+DECK_filename = [get_path('models/engines/turbofan_23k_1.deck'),
+                 get_path('models/engines/turbofan_23k_1.deck')]
 TIME_CONSTRAINT_MIN = [0, 0]  # set to zeros if you don't want to use it
 
 # END OF QUPCE / UNCERTAINTY OUTPUTS
@@ -42,6 +42,8 @@ TIME_CONSTRAINT_MIN = [0, 0]  # set to zeros if you don't want to use it
 # One place to make changes to all mach and alt optimization options
 opt_mach = False
 opt_alt = False
+
+Optimizer = "SNOPT"  # SNOPT OR SLSQP
 
 
 # Check to make sure all the input vectors are the same length
@@ -171,7 +173,17 @@ class MultiMissionProblem(om.Problem):
 
     def add_driver(self):
         self.driver = om.pyOptSparseDriver()
-        self.driver.options["optimizer"] = "SLSQP"
+        if Optimizer == "SLSQP":
+            self.driver.options["optimizer"] = "SLSQP"
+        elif Optimizer == "SNOPT":
+            self.driver.options["optimizer"] = "SNOPT"
+            self.driver.opt_settings["Major optimality tolerance"] = 1e-7
+            self.driver.opt_settings["Major feasibility tolerance"] = 1e-7
+            # self.driver.opt_settings["Major iterations"] = 0
+            self.driver.opt_settings["iSumm"] = 6
+            self.driver.opt_settings["iPrint"] = 9
+            self.driver.opt_settings['Verify level'] = -1
+            self.driver.opt_settings["Nonderivative linesearch"] = None
         self.driver.declare_coloring()
         # linear solver causes nan entry error for landing to takeoff mass ratio param
         # self.model.linear_solver = om.DirectSolver()
@@ -208,7 +220,7 @@ class MultiMissionProblem(om.Problem):
             promotes_inputs=self.fuel_vars,
             promotes_outputs=["compound"])
 
-        self.model.add_objective('compound')
+        self.model.add_objective('compound', ref=1e3)
 
     def setup_wrapper(self):
         """Wrapper for om.Problem setup with warning ignoring and setting options"""
