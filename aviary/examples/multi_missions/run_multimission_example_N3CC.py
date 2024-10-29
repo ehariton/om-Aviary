@@ -40,7 +40,7 @@ TIME_CONSTRAINT_MIN = [0, 0]  # set to zeros if you don't want to use it
 ######################################################################
 
 # One place to make changes to all mach and alt optimization options
-opt_mach = False
+opt_mach = True
 opt_alt = False
 
 Optimizer = "SNOPT"  # SNOPT OR SLSQP
@@ -59,7 +59,7 @@ if len(TOTAL_PAYLOAD_MASS_LBM) != len(DECK_filename) or \
 # This constraint only becomes active when the initial guess on Design.GROSS_MASS is
 # small. When guessing a Design.GROSS_MASS that is larger, SLSQP does not always work
 # hard enough to minimize that value and it's feasible so it stops the opt before it should.
-Design_GROSS_MASS_LBM = 120734
+Design_GROSS_MASS_LBM = 140000
 
 
 def Create_phase_and_values(Design_GROSS_MASS_LBM, TOTAL_PAYLOAD_MASS_LBM, DECK_filename, opt_mach, opt_alt):
@@ -159,7 +159,7 @@ class MultiMissionProblem(om.Problem):
                 self.group_prefix + f'_{i}', prob.model,
                 promotes_inputs=[Mission.Design.GROSS_MASS,
                                  Mission.Design.RANGE,
-                                 #  Aircraft.Wing.SPAN,
+                                 Aircraft.Wing.SWEEP,
                                  #  Aircraft.Wing.AREA
                                  ],
                 promotes_outputs=[(Mission.Objectives.FUEL, promoted_name)])
@@ -167,6 +167,7 @@ class MultiMissionProblem(om.Problem):
     def add_design_variables(self):
         self.model.add_design_var(Mission.Design.GROSS_MASS,
                                   lower=10., upper=900e3, units='lbm')
+        self.model.add_design_var(Aircraft.Wing.SWEEP, lower=20., upper=35., units='deg')
         # self.model.add_design_var(Aircraft.Wing.SPAN, lower=100., upper=500., units='ft')
         # self.model.add_design_var(Aircraft.Wing.AREA, lower=10.,
         #                           upper=1e6, units='ft**2')
@@ -220,7 +221,7 @@ class MultiMissionProblem(om.Problem):
             promotes_inputs=self.fuel_vars,
             promotes_outputs=["compound"])
 
-        self.model.add_objective('compound', ref=1e3)
+        self.model.add_objective('compound')
 
     def setup_wrapper(self):
         """Wrapper for om.Problem setup with warning ignoring and setting options"""
@@ -386,7 +387,8 @@ def N3CC_example(makeN2=False):
         (Aircraft.Design.LANDING_TO_TAKEOFF_MASS_RATIO, 'unitless'),
         (Mission.Summary.CRUISE_MACH, 'unitless'),
         (Aircraft.Furnishings.MASS, 'lbm'),
-        (Aircraft.CrewPayload.PASSENGER_SERVICE_MASS, 'lbm')]
+        (Aircraft.CrewPayload.PASSENGER_SERVICE_MASS, 'lbm'),
+        (Aircraft.Wing.SWEEP, 'deg')]
     super_prob.print_vars(vars=printoutputs)
 
     plotvars = [('altitude', 'ft'),
