@@ -1,20 +1,18 @@
 import openmdao.api as om
-import numpy as np
 
-from aviary.variable_info.variables import Aircraft, Dynamic
-from aviary.utils.aviary_values import AviaryValues
 from aviary.subsystems.propulsion.motor.model.motor_map import MotorMap
+from aviary.utils.aviary_values import AviaryValues
+from aviary.variable_info.variables import Aircraft, Dynamic
 
 
 class MotorPreMission(om.Group):
-    """
-    Calculate electric motor mass for a single motor
-    """
+    """Calculate electric motor mass for a single motor."""
 
     def initialize(self):
         self.options.declare(
-            "aviary_inputs", types=AviaryValues,
-            desc="collection of Aircraft/Mission specific options",
+            'aviary_inputs',
+            types=AviaryValues,
+            desc='collection of Aircraft/Mission specific options',
             default=None,
         )
         self.name = 'motor_premission'
@@ -27,11 +25,9 @@ class MotorPreMission(om.Group):
         # Without inputs it will return the max torque based on the non-dimensional
         #   scale factor chosen by the optimizer.
         # The max torque is then used in pre-mission to determine weight of the system.
-        design_rpm = self.options['aviary_inputs'].get_val(
-            Aircraft.Engine.RPM_DESIGN, units='rpm'
-        )
+        design_rpm = self.options['aviary_inputs'].get_val(Aircraft.Engine.RPM_DESIGN, units='rpm')
 
-        self.set_input_defaults(Dynamic.Mission.THROTTLE, 1.0, units=None)
+        self.set_input_defaults(Dynamic.Vehicle.Propulsion.THROTTLE, 1.0, units=None)
         self.set_input_defaults('design_rpm', design_rpm, units='rpm')
 
         self.add_subsystem(
@@ -39,11 +35,11 @@ class MotorPreMission(om.Group):
             MotorMap(num_nodes=1),
             promotes_inputs=[
                 Aircraft.Engine.SCALE_FACTOR,
-                Dynamic.Mission.THROTTLE,
-                (Dynamic.Mission.RPM, 'design_rpm'),
+                Dynamic.Vehicle.Propulsion.THROTTLE,
+                (Dynamic.Vehicle.Propulsion.RPM, 'design_rpm'),
             ],
             promotes_outputs=[
-                (Dynamic.Mission.TORQUE, Aircraft.Engine.Motor.TORQUE_MAX)
+                (Dynamic.Vehicle.Propulsion.TORQUE, Aircraft.Engine.Motor.TORQUE_MAX)
             ],
         )
 
