@@ -1,4 +1,3 @@
-
 import warnings
 from enum import Enum
 
@@ -6,35 +5,40 @@ import openmdao.api as om
 from openmdao.utils.assert_utils import assert_check_partials, assert_near_equal
 from parameterized import param
 
+from aviary.subsystems.propulsion.utils import build_engine_deck
 from aviary.utils.aviary_values import AviaryValues
 from aviary.utils.options import list_options as list_options_func
-from aviary.subsystems.propulsion.utils import build_engine_deck
 from aviary.utils.preprocessors import preprocess_options
-from aviary.validation_cases.validation_data.flops_data.FLOPS_Test_Data import \
-    FLOPS_Test_Data, FLOPS_Lacking_Test_Data
+from aviary.validation_cases.validation_data.flops_data.FLOPS_Test_Data import (
+    FLOPS_Lacking_Test_Data,
+    FLOPS_Test_Data,
+)
+from aviary.variable_info.functions import extract_options
 from aviary.variable_info.variables import Aircraft
 
 Version = Enum('Version', ['ALL', 'TRANSPORT', 'ALTERNATE', 'BWB'])
 
 
-def do_validation_test(prob: om.Problem,
-                       case_name: str,
-                       input_validation_data: AviaryValues,
-                       output_validation_data: AviaryValues,
-                       input_keys: list,
-                       output_keys: list,
-                       aviary_option_keys: list = None,
-                       tol: float = 1.0e-4,
-                       atol: float = 1.0e-12,
-                       rtol: float = 1.0e-12,
-                       method: str = "cs",
-                       step: float = None,
-                       check_values: bool = True,
-                       check_partials: bool = True,
-                       excludes: list = None,
-                       list_inputs: bool = False,
-                       list_outputs: bool = False,
-                       list_options: bool = False):
+def do_validation_test(
+    prob: om.Problem,
+    case_name: str,
+    input_validation_data: AviaryValues,
+    output_validation_data: AviaryValues,
+    input_keys: list,
+    output_keys: list,
+    aviary_option_keys: list = None,
+    tol: float = 1.0e-4,
+    atol: float = 1.0e-12,
+    rtol: float = 1.0e-12,
+    method: str = 'cs',
+    step: float = None,
+    check_values: bool = True,
+    check_partials: bool = True,
+    excludes: list = None,
+    list_inputs: bool = False,
+    list_outputs: bool = False,
+    list_options: bool = False,
+):
     """
     Runs a validation test with user-supplied validation data.
 
@@ -96,7 +100,6 @@ def do_validation_test(prob: om.Problem,
         If True, prob.model.list_outputs() will be called after the model is run.
         Default is False.
     """
-
     input_key_list = _assure_is_list(input_keys)
     output_key_list = _assure_is_list(output_keys)
     aviary_option_key_list = _assure_is_list(aviary_option_keys)
@@ -110,7 +113,6 @@ def do_validation_test(prob: om.Problem,
         prob.set_val(key, desired, units)
 
     prob.run_model()
-    print(case_name)
 
     if list_options:
         list_options_func(prob.model, aviary_keys=aviary_option_key_list)
@@ -132,29 +134,32 @@ def do_validation_test(prob: om.Problem,
 
     if check_partials:
         partial_data = prob.check_partials(
-            compact_print=True, method=method, step=step, excludes=excludes)
+            out_stream=None, method=method, step=step, excludes=excludes
+        )
         assert_check_partials(partial_data, atol=atol, rtol=rtol)
 
 
-def flops_validation_test(prob: om.Problem,
-                          case_name: str,
-                          input_keys: list,
-                          output_keys: list,
-                          aviary_option_keys: list = None,
-                          version: Version = Version.ALL,
-                          tol: float = 1.0e-4,
-                          atol: float = 1.0e-12,
-                          rtol: float = 1.0e-12,
-                          method: str = "cs",
-                          step: float = None,
-                          check_values: bool = True,
-                          check_partials: bool = True,
-                          excludes: list = None,
-                          list_inputs: bool = False,
-                          list_outputs: bool = False,
-                          list_options: bool = False,
-                          flops_inputs=None,
-                          flops_outputs=None):
+def flops_validation_test(
+    prob: om.Problem,
+    case_name: str,
+    input_keys: list,
+    output_keys: list,
+    aviary_option_keys: list = None,
+    version: Version = Version.ALL,
+    tol: float = 1.0e-4,
+    atol: float = 1.0e-12,
+    rtol: float = 1.0e-12,
+    method: str = 'cs',
+    step: float = None,
+    check_values: bool = True,
+    check_partials: bool = True,
+    excludes: list = None,
+    list_inputs: bool = False,
+    list_outputs: bool = False,
+    list_options: bool = False,
+    flops_inputs=None,
+    flops_outputs=None,
+):
     """
     Set a model, runs the model and runs a validation test using FLOPS validation data.
 
@@ -217,46 +222,49 @@ def flops_validation_test(prob: om.Problem,
         Allows a custom set of outputs to be tested. Default is None, which reads
         data from FLOPS_Test_Data with key case_name.
     """
-
     if not isinstance(version, Version):
         raise TypeError('parameter "version" must be of enumeration type "Version"')
 
     if flops_inputs is None and flops_outputs is None:
         flops_data = FLOPS_Test_Data[case_name]
-        flops_inputs = flops_data['inputs']
-        flops_outputs = flops_data['outputs']
+        flops_inputs = flops_data['inputs'].deepcopy()
+        flops_outputs = flops_data['outputs'].deepcopy()
 
-    if version is Version.TRANSPORT and flops_inputs.get_val(Aircraft.Design.USE_ALT_MASS) or \
-            version is Version.ALTERNATE and not flops_inputs.get_val(Aircraft.Design.USE_ALT_MASS):
+    if (
+        version is Version.TRANSPORT
+        and flops_inputs.get_val(Aircraft.Design.USE_ALT_MASS)
+        or version is Version.ALTERNATE
+        and not flops_inputs.get_val(Aircraft.Design.USE_ALT_MASS)
+    ):
         return
 
     # TODO: Currently no BWB validation data.
     # For BWBs, skip the validation test, but do check the partials.
     check_values_in = check_values
-    check_values = (
-        check_values and version is not Version.BWB
-    )
+    check_values = check_values and version is not Version.BWB
     if not check_values and check_values_in:
         warnings.warn('Not checking values because validation data not available.')
 
-    do_validation_test(prob=prob,
-                       case_name=case_name,
-                       input_validation_data=flops_inputs,
-                       output_validation_data=flops_outputs,
-                       input_keys=input_keys,
-                       output_keys=output_keys,
-                       aviary_option_keys=aviary_option_keys,
-                       tol=tol,
-                       atol=atol,
-                       rtol=rtol,
-                       method=method,
-                       step=step,
-                       check_values=check_values,
-                       check_partials=check_partials,
-                       excludes=excludes,
-                       list_options=list_options,
-                       list_inputs=list_inputs,
-                       list_outputs=list_outputs)
+    do_validation_test(
+        prob=prob,
+        case_name=case_name,
+        input_validation_data=flops_inputs,
+        output_validation_data=flops_outputs,
+        input_keys=input_keys,
+        output_keys=output_keys,
+        aviary_option_keys=aviary_option_keys,
+        tol=tol,
+        atol=atol,
+        rtol=rtol,
+        method=method,
+        step=step,
+        check_values=check_values,
+        check_partials=check_partials,
+        excludes=excludes,
+        list_options=list_options,
+        list_inputs=list_inputs,
+        list_outputs=list_outputs,
+    )
 
 
 def get_flops_data(case_name: str, keys: str = None, preprocess: bool = False) -> AviaryValues:
@@ -272,6 +280,9 @@ def get_flops_data(case_name: str, keys: str = None, preprocess: bool = False) -
     keys : str, or iter of str
         List of variables whose values will be transferred from the validation data.
         The default is all variables.
+    preprocess: bool
+        If true, the input data will be passed through preprocess_options() to
+        fill in any missing options before being returned. The default is False.
     """
     flops_data_copy: AviaryValues = get_flops_inputs(case_name, preprocess=preprocess)
     flops_data_copy.update(get_flops_outputs(case_name))
@@ -305,13 +316,49 @@ def get_flops_inputs(case_name: str, keys: str = None, preprocess: bool = False)
 
     flops_inputs_copy: AviaryValues = flops_data['inputs'].deepcopy()
     if preprocess:
-        preprocess_options(flops_inputs_copy,
-                           engine_models=build_engine_deck(flops_inputs_copy))
+        preprocess_options(
+            flops_inputs_copy,
+            engine_models=[build_engine_deck(flops_inputs_copy)],
+            verbosity=0,
+        )
     if keys is None:
         return flops_inputs_copy
     keys_list = _assure_is_list(keys)
 
     return AviaryValues({key: flops_inputs_copy.get_item(key) for key in keys_list})
+
+
+def get_flops_options(case_name: str, keys: str = None, preprocess: bool = False) -> AviaryValues:
+    """
+    Returns a dictionary containing options for the named FLOPS validation case.
+
+    Parameters
+    ----------
+    case_name : str
+        Name of the case being run. Input data will be looked up from
+        the corresponding case in the FLOPS validation data collection.
+    keys : str, or iter of str
+        List of variables whose values will be transferred from the input data.
+        The default is all variables.
+    preprocess: bool
+        If true, the input data will be passed through preprocess_options() to
+        fill in any missing options before being returned. The default is False.
+    """
+    try:
+        flops_data: dict = FLOPS_Test_Data[case_name]
+    except KeyError:
+        flops_data: dict = FLOPS_Lacking_Test_Data[case_name]
+
+    flops_inputs_copy: AviaryValues = flops_data['inputs'].deepcopy()
+    if preprocess:
+        preprocess_options(flops_inputs_copy, engine_models=[build_engine_deck(flops_inputs_copy)])
+
+    if keys is None:
+        options = extract_options(flops_inputs_copy)
+    else:
+        options = extract_options(keys)
+
+    return options
 
 
 def get_flops_outputs(case_name: str, keys: str = None) -> AviaryValues:
@@ -377,7 +424,6 @@ def print_case(testcase_func, param_num, param: param):
 
 
 def _assure_is_list(keys, backup=None):
-
     if isinstance(keys, str):
         return [keys]
     elif not keys:
