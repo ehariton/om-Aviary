@@ -1,27 +1,18 @@
 import numpy as np
-
 import openmdao.api as om
-from aviary.utils.aviary_values import AviaryValues
 
-from aviary.variable_info.variables import Dynamic, Aircraft, Mission
+from aviary.variable_info.variables import Aircraft, Dynamic, Mission
 
 
 class GearboxMission(om.Group):
-    """
-    Calculates the mission performance of a single gearbox.
-    """
+    """Calculates the mission performance of a single gearbox."""
 
     def initialize(self):
-        self.options.declare("num_nodes", types=int)
-        self.options.declare(
-            'aviary_inputs', types=AviaryValues,
-            desc='collection of Aircraft/Mission specific options',
-            default=None,
-        )
+        self.options.declare('num_nodes', types=int)
         self.name = 'gearbox_mission'
 
     def setup(self):
-        n = self.options["num_nodes"]
+        n = self.options['num_nodes']
 
         self.add_subsystem(
             'rpm_comp',
@@ -33,10 +24,10 @@ class GearboxMission(om.Group):
                 has_diag_partials=True,
             ),
             promotes_inputs=[
-                ('rpm_in', Dynamic.Mission.RPM + '_in'),
+                ('rpm_in', Dynamic.Vehicle.Propulsion.RPM + '_in'),
                 ('gear_ratio', Aircraft.Engine.Gearbox.GEAR_RATIO),
             ],
-            promotes_outputs=[('rpm_out', Dynamic.Mission.RPM + '_out')],
+            promotes_outputs=[('rpm_out', Dynamic.Vehicle.Propulsion.RPM + '_out')],
         )
 
         self.add_subsystem(
@@ -49,12 +40,10 @@ class GearboxMission(om.Group):
                 has_diag_partials=True,
             ),
             promotes_inputs=[
-                ('shaft_power_in', Dynamic.Mission.SHAFT_POWER + '_in'),
+                ('shaft_power_in', Dynamic.Vehicle.Propulsion.SHAFT_POWER + '_in'),
                 ('efficiency', Aircraft.Engine.Gearbox.EFFICIENCY),
             ],
-            promotes_outputs=[
-                ('shaft_power_out', Dynamic.Mission.SHAFT_POWER + '_out')
-            ],
+            promotes_outputs=[('shaft_power_out', Dynamic.Vehicle.Propulsion.SHAFT_POWER + '_out')],
         )
 
         self.add_subsystem(
@@ -66,16 +55,16 @@ class GearboxMission(om.Group):
                 rpm_out={'val': np.ones(n), 'units': 'rad/s'},
                 has_diag_partials=True,
             ),
-            promotes_outputs=[('torque_out', Dynamic.Mission.TORQUE + '_out')],
+            promotes_outputs=[('torque_out', Dynamic.Vehicle.Propulsion.TORQUE + '_out')],
         )
         self.connect(
-            f'{Dynamic.Mission.SHAFT_POWER}_out',
-            f'torque_comp.shaft_power_out',
+            f'{Dynamic.Vehicle.Propulsion.SHAFT_POWER}_out',
+            'torque_comp.shaft_power_out',
         )
 
         self.connect(
-            f'{Dynamic.Mission.RPM}_out',
-            f'torque_comp.rpm_out',
+            f'{Dynamic.Vehicle.Propulsion.RPM}_out',
+            'torque_comp.rpm_out',
         )
 
         # Determine the maximum power available at this flight condition
@@ -90,11 +79,11 @@ class GearboxMission(om.Group):
                 has_diag_partials=True,
             ),
             promotes_inputs=[
-                ('shaft_power_in', Dynamic.Mission.SHAFT_POWER_MAX + '_in'),
+                ('shaft_power_in', Dynamic.Vehicle.Propulsion.SHAFT_POWER_MAX + '_in'),
                 ('efficiency', Aircraft.Engine.Gearbox.EFFICIENCY),
             ],
             promotes_outputs=[
-                ('shaft_power_out', Dynamic.Mission.SHAFT_POWER_MAX + '_out')
+                ('shaft_power_out', Dynamic.Vehicle.Propulsion.SHAFT_POWER_MAX + '_out')
             ],
         )
 
@@ -113,7 +102,7 @@ class GearboxMission(om.Group):
                 has_diag_partials=True,
             ),
             promotes_inputs=[
-                ('shaft_power_max', Dynamic.Mission.SHAFT_POWER_MAX + '_in'),
+                ('shaft_power_max', Dynamic.Vehicle.Propulsion.SHAFT_POWER_MAX + '_in'),
                 ('shaft_power_design', Aircraft.Engine.Gearbox.SHAFT_POWER_DESIGN),
             ],
             promotes_outputs=[

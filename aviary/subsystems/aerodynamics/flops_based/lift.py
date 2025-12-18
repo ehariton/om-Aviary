@@ -2,16 +2,14 @@ import numpy as np
 import openmdao.api as om
 
 import aviary.constants as constants
-from aviary.variable_info.functions import add_aviary_input
+from aviary.variable_info.functions import add_aviary_input, add_aviary_output
 from aviary.variable_info.variables import Aircraft, Dynamic
 
 grav_metric = constants.GRAV_METRIC_FLOPS
 
 
 class SimpleLift(om.ExplicitComponent):
-    '''
-    Calculate lift as a function of wing area, dynamic pressure, and lift coefficient.
-    '''
+    """Calculate lift as a function of wing area, dynamic pressure, and lift coefficient."""
 
     def initialize(self):
         self.options.declare('num_nodes', types=int)
@@ -19,43 +17,44 @@ class SimpleLift(om.ExplicitComponent):
     def setup(self):
         nn = self.options['num_nodes']
 
-        add_aviary_input(self, Aircraft.Wing.AREA, val=1., units='m**2')
+        add_aviary_input(self, Aircraft.Wing.AREA, units='m**2')
+
+        add_aviary_input(self, Dynamic.Atmosphere.DYNAMIC_PRESSURE, shape=nn, units='N/m**2')
 
         self.add_input(
-            Dynamic.Mission.DYNAMIC_PRESSURE, val=np.ones(nn), units='N/m**2',
-            desc='pressure caused by fluid motion')
+            name='cl', val=np.ones(nn), desc='current coefficient of lift', units='unitless'
+        )
 
-        self.add_input(
-            name='cl', val=np.ones(nn), desc='current coefficient of lift',
-            units='unitless')
-
-        self.add_output(name=Dynamic.Mission.LIFT,
-                        val=np.ones(nn), desc='Lift', units='N')
+        add_aviary_output(self, Dynamic.Vehicle.LIFT, shape=nn, units='N')
 
     def setup_partials(self):
         nn = self.options['num_nodes']
         rows_cols = np.arange(nn)
 
-        self.declare_partials(Dynamic.Mission.LIFT, Aircraft.Wing.AREA)
+        self.declare_partials(Dynamic.Vehicle.LIFT, Aircraft.Wing.AREA)
 
         self.declare_partials(
-            Dynamic.Mission.LIFT, [Dynamic.Mission.DYNAMIC_PRESSURE, 'cl'], rows=rows_cols, cols=rows_cols)
+            Dynamic.Vehicle.LIFT,
+            [Dynamic.Atmosphere.DYNAMIC_PRESSURE, 'cl'],
+            rows=rows_cols,
+            cols=rows_cols,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         S = inputs[Aircraft.Wing.AREA]
-        q = inputs[Dynamic.Mission.DYNAMIC_PRESSURE]
+        q = inputs[Dynamic.Atmosphere.DYNAMIC_PRESSURE]
         CL = inputs['cl']
 
-        outputs[Dynamic.Mission.LIFT] = q * S * CL
+        outputs[Dynamic.Vehicle.LIFT] = q * S * CL
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         S = inputs[Aircraft.Wing.AREA]
-        q = inputs[Dynamic.Mission.DYNAMIC_PRESSURE]
+        q = inputs[Dynamic.Atmosphere.DYNAMIC_PRESSURE]
         CL = inputs['cl']
 
-        partials[Dynamic.Mission.LIFT, Aircraft.Wing.AREA] = q * CL
-        partials[Dynamic.Mission.LIFT, Dynamic.Mission.DYNAMIC_PRESSURE] = S * CL
-        partials[Dynamic.Mission.LIFT, 'cl'] = q * S
+        partials[Dynamic.Vehicle.LIFT, Aircraft.Wing.AREA] = q * CL
+        partials[Dynamic.Vehicle.LIFT, Dynamic.Atmosphere.DYNAMIC_PRESSURE] = S * CL
+        partials[Dynamic.Vehicle.LIFT, 'cl'] = q * S
 
 
 class LiftEqualsWeight(om.ExplicitComponent):
@@ -71,51 +70,54 @@ class LiftEqualsWeight(om.ExplicitComponent):
     def setup(self):
         nn = self.options['num_nodes']
 
-        add_aviary_input(self, varname=Aircraft.Wing.AREA, val=1.0, units='m**2')
+        add_aviary_input(self, Aircraft.Wing.AREA, units='m**2')
 
-        self.add_input(
-            name=Dynamic.Mission.MASS, val=np.ones(nn), desc='current aircraft mass',
-            units='kg')
+        add_aviary_input(self, Dynamic.Vehicle.MASS, shape=nn, units='kg')
 
-        self.add_input(
-            Dynamic.Mission.DYNAMIC_PRESSURE, val=np.ones(nn), units='N/m**2',
-            desc='pressure caused by fluid motion')
+        add_aviary_input(self, Dynamic.Atmosphere.DYNAMIC_PRESSURE, shape=nn, units='N/m**2')
 
         self.add_output(
-            name='cl', val=np.ones(nn), desc='current coefficient of lift',
-            units='unitless')
+            name='cl', val=np.ones(nn), desc='current coefficient of lift', units='unitless'
+        )
 
-        self.add_output(name=Dynamic.Mission.LIFT,
-                        val=np.ones(nn), desc='Lift', units='N')
+        add_aviary_output(self, Dynamic.Vehicle.LIFT, shape=nn, units='N')
 
     def setup_partials(self):
         nn = self.options['num_nodes']
         row_col = np.arange(nn)
 
         self.declare_partials(
-            Dynamic.Mission.LIFT, Dynamic.Mission.MASS, rows=row_col, cols=row_col, val=grav_metric)
+            Dynamic.Vehicle.LIFT, Dynamic.Vehicle.MASS, rows=row_col, cols=row_col, val=grav_metric
+        )
 
         self.declare_partials(
-            Dynamic.Mission.LIFT, [Aircraft.Wing.AREA, Dynamic.Mission.DYNAMIC_PRESSURE], dependent=False)
+            Dynamic.Vehicle.LIFT,
+            [Aircraft.Wing.AREA, Dynamic.Atmosphere.DYNAMIC_PRESSURE],
+            dependent=False,
+        )
 
         self.declare_partials('cl', Aircraft.Wing.AREA)
 
         self.declare_partials(
-            'cl', [Dynamic.Mission.MASS, Dynamic.Mission.DYNAMIC_PRESSURE], rows=row_col, cols=row_col)
+            'cl',
+            [Dynamic.Vehicle.MASS, Dynamic.Atmosphere.DYNAMIC_PRESSURE],
+            rows=row_col,
+            cols=row_col,
+        )
 
     def compute(self, inputs, outputs):
         S = inputs[Aircraft.Wing.AREA]
-        q = inputs[Dynamic.Mission.DYNAMIC_PRESSURE]
-        weight = grav_metric * inputs[Dynamic.Mission.MASS]
+        q = inputs[Dynamic.Atmosphere.DYNAMIC_PRESSURE]
+        weight = grav_metric * inputs[Dynamic.Vehicle.MASS]
 
         outputs['cl'] = weight / (q * S)
 
-        outputs[Dynamic.Mission.LIFT] = weight
+        outputs[Dynamic.Vehicle.LIFT] = weight
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         S = inputs[Aircraft.Wing.AREA]
-        q = inputs[Dynamic.Mission.DYNAMIC_PRESSURE]
-        weight = grav_metric * inputs[Dynamic.Mission.MASS]
+        q = inputs[Dynamic.Atmosphere.DYNAMIC_PRESSURE]
+        weight = grav_metric * inputs[Dynamic.Vehicle.MASS]
 
         f = weight / q
         # df = 0.
@@ -123,10 +125,10 @@ class LiftEqualsWeight(om.ExplicitComponent):
         # dg = 1.
         partials['cl', Aircraft.Wing.AREA] = -f / g**2
 
-        partials['cl', Dynamic.Mission.MASS] = grav_metric / (q * S)
+        partials['cl', Dynamic.Vehicle.MASS] = grav_metric / (q * S)
 
         f = weight / S
         # df = 0.
         g = q
         # dg = 1.
-        partials['cl', Dynamic.Mission.DYNAMIC_PRESSURE] = -f / g**2
+        partials['cl', Dynamic.Atmosphere.DYNAMIC_PRESSURE] = -f / g**2
