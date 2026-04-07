@@ -1331,6 +1331,7 @@ def _setup_F2A_parser(parser):
     parser.add_argument(
         '-f',
         '--format',
+        dest='legacy_code',
         type=LegacyCode,
         help='Name of the legacy code the deck originated from',
         choices=set(LegacyCode),
